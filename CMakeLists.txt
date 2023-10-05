@@ -46,6 +46,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 add_library(${PROJECT_NAME} SHARED
 	src/main.cc
+   src/solution.cc
 	)
 
 target_link_libraries(${PROJECT_NAME}
@@ -59,4 +60,7 @@ ${Pangolin_LIBRARIES}
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
 add_executable(test example/test.cc)
 target_link_libraries(test ${PROJECT_NAME})
+
+add_executable(interval src/main.cc)
+target_link_libraries(interval ${PROJECT_NAME})
 
