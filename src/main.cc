@@ -16,6 +16,7 @@ int main()
     for(int i = 0; i < mergedIntervals.size(); i++){
         std::cout << "merged Interval " << i + 1 << ": [" << mergedIntervals[i].first << ", " << mergedIntervals[i].second << "]" << std::endl;
     }
+
     ClashOfClans* DragenA = new LightDragen();
     ClashOfClans* SavageA = new Savage();
     std::cout << " Let the Dragen out, and its blood " << DragenA->getBlood() <<std::endl; 

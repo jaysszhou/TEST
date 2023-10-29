@@ -32,7 +32,8 @@ find_package(OpenCV REQUIRED)
 message(STATUS "OpenCV INCLUDE: " ${OpenCV_INCLUDE_DIRS})
 message(STATUS "OpenCV LIBS: " ${OpenCV_LIBS})
 
-find_package(Eigen3 3.1.0 REQUIRED)
+find_package(Eigen3 REQUIRED)
+message(STATUS "Eigen3 LIBS: " ${EIGEN3_LIBS})
 find_package(Pangolin REQUIRED)
 
 include_directories(

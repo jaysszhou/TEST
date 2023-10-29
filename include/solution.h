@@ -3,6 +3,7 @@
 #define SOLUTION_H
 
 #include <opencv2/opencv.hpp>
+#include<Eigen/Dense>
 class Solution 
 {   
 public:
