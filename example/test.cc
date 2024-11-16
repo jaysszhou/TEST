@@ -85,10 +85,6 @@ int main(int argc, char *argv[])
     }
     outputfile.close();
     std::vector<double>res = GaussNewton(randomSet);
-    std::cout << "res.size() == " << res.size() << std::endl;
-    for(auto i : res){
-        std::cout << i << " " <<std::endl;
-    }
     std::cout <<  std::setprecision(6) <<  "Least Square Method " << res[0] << " , " << res[1] << " , " << res[2] <<std::endl;
     return 0; 
 }

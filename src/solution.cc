@@ -2,6 +2,8 @@
 #include <vector>
 #include <random>
 #include <algorithm>
+#include <thread>
+#include <chrono>
 #include "solution.h"
 
 std::vector<std::pair<int, int>> Solution::generateRandomIntervals(int k) {
@@ -43,4 +45,15 @@ std::vector<std::pair<int, int>> Solution::MergeInterval(std::vector<std::pair<i
         }
     }
     return res;
+}
+
+void Solution::IdleStatus(){
+    HeartBeat();
+}
+
+void Solution::HeartBeat(){
+    while(true){
+        std::cout << " Heart beat !" << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
 }
