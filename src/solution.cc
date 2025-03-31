@@ -10,8 +10,55 @@ namespace Practice
 {
     namespace
     {
+        constexpr double kEpsilon = 1e-6;
         constexpr double kStep = 0.2;
-    };
+        constexpr double kGridSize = 0.5;
+
+        Eigen::Vector2d ToGridMapCoordinate(const Point &point)
+        {
+            return {point.x() / kGridSize, point.y() / kGridSize};
+        }
+
+        std::vector<Eigen::Vector2d> GetGridMap(const Polygon &rect, const double gridSize)
+        {
+            std::vector<Eigen::Vector2d> grid_cells;
+            const Eigen::Vector2d &point_a = {rect[0].x(), rect[0].y()};
+            const Eigen::Vector2d &point_b = {rect[1].x(), rect[1].y()};
+            const Eigen::Vector2d &point_c = {rect[2].x(), rect[2].y()};
+            const Eigen::Vector2d &point_d = {rect[3].x(), rect[3].y()};
+
+            // 计算矩形的 AABB（轴对齐包围盒）
+            double min_X = std::min({point_a.x(), point_b.x(), point_c.x(), point_d.x()});
+            double max_X = std::max({point_a.x(), point_b.x(), point_c.x(), point_d.x()});
+            double min_Y = std::min({point_a.y(), point_b.y(), point_c.y(), point_d.y()});
+            double max_Y = std::max({point_a.y(), point_b.y(), point_c.y(), point_d.y()});
+
+            // 遍历 AABB 内的所有网格
+            for (double x = min_X; x <= max_X; x += gridSize)
+            {
+                for (float y = min_Y; y <= max_Y; y += gridSize)
+                {
+                    const Eigen::Vector2d cell_center = ToGridMapCoordinate(Eigen::Vector3d(x, y, 0));
+                    grid_cells.push_back(cell_center);
+                }
+            }
+            return grid_cells;
+        }
+
+        std::vector<Eigen::Vector2d> GetPolyline(const Point &traj_point, const Point &direction)
+        {
+            std::vector<Eigen::Vector2d> polyline;
+            for (double length = 0; length <= 5.0; length += kStep)
+            {
+                const Point &point = traj_point + length * direction;
+                const auto &point_in_grid_map = ToGridMapCoordinate(point);
+                polyline.push_back(point_in_grid_map);
+            }
+            return polyline;
+        }
+
+    }; // namespace
+
     std::vector<std::pair<int, int>> Solution::generateRandomIntervals(int k)
     {
         std::random_device rd;
@@ -46,7 +93,7 @@ namespace Practice
              { return a.first < b.first; });
         std::vector<std::pair<int, int>> res;
         res.push_back(groups[0]);
-        for (int i = 1; i < groups.size(); i++)
+        for (size_t i = 1; i < groups.size(); i++)
         {
             if (groups[i].first <= res.back().second)
             {
@@ -104,9 +151,9 @@ namespace Practice
     void Solution::TestPolygon()
     {
         Point traj_point(0, 0, 0);
-        Point direction(0, 1.5, 0);
-        SavePolyline(traj_point, direction, "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/polyline.txt");
+        Point direction(1, 1.5, 0);
         direction.normalize();
+        SavePolyline(traj_point, direction, "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/polyline.txt");
         std::vector<Polygon> polygons;
         Polygon polygon;
         polygon.push_back(Point(1, 0, 0));
@@ -124,7 +171,7 @@ namespace Practice
         }
         else
         {
-            std::cout << "Line not crossed with polygon!" << std::endl;
+            std::cout << "Line does not crossed with polygon!" << std::endl;
         }
         return;
     }
@@ -136,7 +183,8 @@ namespace Practice
         {
             for (const auto &point : polygon)
             {
-                file << point.x() << " " << point.y() << " " << point.z() << std::endl;
+                const auto &point_in_grid_map = ToGridMapCoordinate(point);
+                file << point_in_grid_map.x() << " " << point_in_grid_map.y() << " " << 0 << std::endl;
             }
         }
         file.close();
@@ -144,19 +192,57 @@ namespace Practice
 
     void Solution::SavePolyline(const Point &traj_point, const Point &direction, std::string filename)
     {
+        std::vector<Eigen::Vector2d> polyline = GetPolyline(traj_point, direction);
         std::ofstream file(filename);
-        for(double length = 0; length <= 5.0; length += kStep)
+        for (const auto &point : polyline)
         {
-            Point point = traj_point + length * direction;
-            file << point.x() << " " << point.y() << " " << point.z() << std::endl;
+            file << point.x() << " " << point.y() << " " << 0 << std::endl;
+        }
+        file.close();
+    }
+
+    void Solution::Save2dPoints(const std::vector<Eigen::Vector2d> &points, std::string filename)
+    {
+        std::ofstream file(filename);
+        for (const auto &point : points)
+        {
+            file << point.x() << " " << point.y() << std::endl;
         }
         file.close();
     }
 
     bool Solution::IsLineCrossedWithPolygon(const Point &traj_point, const Point &direction, const std::vector<Polygon> &polygons)
     {
+        auto is_point_in_grid_map = [&](const Point &point, const std::vector<Eigen::Vector2d> &grid_cells) -> bool
+        {
+            const Eigen::Vector2d point_in_grid_cells = ToGridMapCoordinate(point);
+            std::cout << "point_in_grid_cells: " << point_in_grid_cells.x() << " " << point_in_grid_cells.y() << std::endl;
+            auto id = std::find(grid_cells.begin(), grid_cells.end(), point_in_grid_cells);
+            if (id != grid_cells.end())
+            {
+                return true;
+            }
+            return false;
+        };
 
-        return true;
+        for (const auto &polygon : polygons)
+        {
+            const auto &grid_cells = GetGridMap(polygon, kGridSize);
+            Save2dPoints(grid_cells, "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/grid_cells.txt");
+            for (const auto &point : grid_cells)
+            {
+                std::cout << " grid map: " << point.x() << " " << point.y() << std::endl;
+            }
+            for (double length = 0; length <= 5.0; length += kStep)
+            {
+                Point point = traj_point + length * direction;
+                if (is_point_in_grid_map(point, grid_cells))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 } // namespace Practice

@@ -45,6 +45,7 @@ namespace Practice
 
     private:
         bool IsLineCrossedWithPolygon(const Point &traj_point, const Point &direction, const std::vector<Polygon> &polygons);
+        void Save2dPoints(const std::vector<Eigen::Vector2d> &points, std::string filename);
         void SavePolyline(const Point &traj_point, const Point &direction, std::string filename);
         void SavePolygon(const std::vector<Polygon> &polygons, std::string filename);
         void HeartBeat();
