@@ -92,10 +92,33 @@ void Solution::TestQuote()
     kdTree.print();
     std::cout << " function work well !" << std::endl;
 
-    return ;
+    return;
 }
 
-bool Solution::IsLineCrossedWithPolygon(const std::vector<Eigen::Vector3d> &traj_point, const Eigen::Vector3d &direction, const std::vector<Polygon> &polygons)
+void Solution::TestPolygon()
+{
+    Eigen::Vector3d traj_point(0, 0, 0);
+    Eigen::Vector3d direction(0, 1.5, 0);
+    direction.normalize();
+    std::vector<Polygon> polygons;
+    Polygon polygon;
+    polygon.push_back(Eigen::Vector3d(1, 0, 0));
+    polygon.push_back(Eigen::Vector3d(3, 0, 0));
+    polygon.push_back(Eigen::Vector3d(3, 4, 0));
+    polygon.push_back(Eigen::Vector3d(1, 4, 0));
+    polygons.push_back(polygon);
+    if (IsLineCrossedWithPolygon(traj_point, direction, polygons))
+    {
+        std::cout << "Line crossed with polygon!" << std::endl;
+    }
+    else
+    {
+        std::cout << "Line not crossed with polygon!" << std::endl;
+    }
+    return;
+}
+
+bool Solution::IsLineCrossedWithPolygon(const Eigen::Vector3d &traj_point, const Eigen::Vector3d &direction, const std::vector<Polygon> &polygons)
 {
     return true;
 }

@@ -35,10 +35,11 @@ public:
     std::vector<std::pair<int, int>> generateRandomIntervals(int k);
     std::vector<std::pair<int, int>> MergeInterval(std::vector<std::pair<int, int>> &groups); // Core_JV
     void IdleStatus();
-    bool IsLineCrossedWithPolygon(const std::vector<Eigen::Vector3d> &traj_point, const Eigen::Vector3d &direction, const std::vector<Polygon> &polygons);
     void TestQuote();
+    void TestPolygon();
 
 private:
+    bool IsLineCrossedWithPolygon(const Eigen::Vector3d &traj_point, const Eigen::Vector3d &direction, const std::vector<Polygon> &polygons);
     void HeartBeat();
 };
 #endif

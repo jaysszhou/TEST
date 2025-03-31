@@ -6,4 +6,5 @@ int main()
 {
     Solution solution;
     solution.TestQuote();
+    solution.TestPolygon();
 }

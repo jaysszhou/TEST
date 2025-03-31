@@ -63,6 +63,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
 add_executable(test example/test.cc)
 target_link_libraries(test ${PROJECT_NAME})
 
-add_executable(interval src/main.cc)
-target_link_libraries(interval ${PROJECT_NAME})
+add_executable(run src/main.cc)
+target_link_libraries(run ${PROJECT_NAME})
 
