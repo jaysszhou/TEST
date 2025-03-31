@@ -4,42 +4,51 @@
 
 #include <opencv2/opencv.hpp>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
+#include <vector>
+#include <string>
 
-using Polygon = std::vector<Eigen::Vector3d>;
-
-class KdTree
+namespace Practice
 {
-public:
-    explicit KdTree(const std::vector<int> &data) : data_(data)
+    using Point = Eigen::Vector3d;
+    using Polygon = std::vector<Point>;
+    class KdTree
     {
-        std::cout << " build kdtree successfully! " << std::endl;
-    }
-    ~KdTree() = default;
-
-    void print()
-    {
-        for (const auto data : data_)
+    public:
+        explicit KdTree(const std::vector<int> &data) : data_(data)
         {
-            std::cout << data << std::endl;
+            std::cout << " build kdtree successfully! " << std::endl;
         }
-    }
+        ~KdTree() = default;
 
-private:
-    const std::vector<int> data_; // copy works well but If you use references, it will cause dangling references!
-};
-class Solution
-{
-public:
-    Solution() = default;
-    ~Solution() = default;
-    std::vector<std::pair<int, int>> generateRandomIntervals(int k);
-    std::vector<std::pair<int, int>> MergeInterval(std::vector<std::pair<int, int>> &groups); // Core_JV
-    void IdleStatus();
-    void TestQuote();
-    void TestPolygon();
+        void print()
+        {
+            for (const auto data : data_)
+            {
+                std::cout << data << std::endl;
+            }
+        }
 
-private:
-    bool IsLineCrossedWithPolygon(const Eigen::Vector3d &traj_point, const Eigen::Vector3d &direction, const std::vector<Polygon> &polygons);
-    void HeartBeat();
-};
+    private:
+        const std::vector<int> data_; // copy works well but If you use references, it will cause dangling references!
+    };
+    class Solution
+    {
+    public:
+        Solution() = default;
+        ~Solution() = default;
+        std::vector<std::pair<int, int>> generateRandomIntervals(int k);
+        std::vector<std::pair<int, int>> MergeInterval(std::vector<std::pair<int, int>> &groups); // Core_JV
+        void IdleStatus();
+        void TestQuote();
+        void TestPolygon();
+
+    private:
+        bool IsLineCrossedWithPolygon(const Point &traj_point, const Point &direction, const std::vector<Polygon> &polygons);
+        void SavePolyline(const Point &traj_point, const Point &direction, std::string filename);
+        void SavePolygon(const std::vector<Polygon> &polygons, std::string filename);
+        void HeartBeat();
+    };
+}
+
 #endif

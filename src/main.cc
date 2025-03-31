@@ -2,9 +2,18 @@
 #include "solution.h"
 #include "COC.h"
 
+namespace Practice
+{
+    void run()
+    {
+        Solution solution;
+        solution.TestQuote();
+        solution.TestPolygon();
+    }
+}
+
 int main()
 {
-    Solution solution;
-    solution.TestQuote();
-    solution.TestPolygon();
+    Practice::run();
+    return 0;
 }
