@@ -16,7 +16,7 @@ namespace Practice
 
         Eigen::Vector2d ToGridMapCoordinate(const Point &point)
         {
-            return {point.x() / kGridSize, point.y() / kGridSize};
+            return {std::round(point.x() / kGridSize), std::round(point.y() / kGridSize)};
         }
 
         std::vector<Eigen::Vector2d> GetGridMap(const Polygon &rect, const double gridSize)
