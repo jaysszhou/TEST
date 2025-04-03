@@ -21,6 +21,7 @@ public:
   ~Map() {}
 
   void Process();
+  GridMap GetGridMap() const { return grid_map_; }
 
 private:
   bool Initialize();
