@@ -9,6 +9,7 @@ void run() {
   solution.TestPolygon();
   ClashOfClans coc;
   coc.Process();
+  std::cout << "Thanks for watching!" << std::endl;
 }
 } // namespace Practice
 
