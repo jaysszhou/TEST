@@ -48,7 +48,7 @@ def visualize_map():
 
     # 绘制路径
     if path:
-        path_points = [(point['y'], point['x']) for point in path]  # 转换为 (row, col) 格式
+        path_points = [(point['x'], point['y']) for point in path]  # 转换为 (row, col) 格式
         path_y, path_x = zip(*path_points)  # 分离出 y 和 x 坐标
         ax.plot(path_x, path_y, color='blue', linewidth=2, label='Path')  # 路径用蓝色线标记
     

@@ -258,6 +258,7 @@ std::optional<Path> Solution::BreadthFirstSearch(const GridMap &grid_map) {
         result.push_back(node);
         node = parent_map[node];
       }
+      result.push_back(start);
       std::reverse(result.begin(), result.end());
       return result;
     }
