@@ -11,6 +11,12 @@ namespace {
 constexpr double kEpsilon = 1e-6;
 constexpr double kStep = 0.2;
 constexpr double kGridSize = 0.5;
+constexpr int kDirections[4][2] = {
+    {0, 1},  // up
+    {1, 0},  // right
+    {0, -1}, // down
+    {-1, 0}, // left
+};
 
 Eigen::Vector2d ToGridMapCoordinate(const Point &point) {
   return {std::round(point.x() / kGridSize), std::round(point.y() / kGridSize)};
@@ -218,12 +224,57 @@ bool Solution::IsLineCrossedWithPolygon(const Point &traj_point,
   }
   return false;
 }
-Path Solution::BreadthFirstSearch(const GridMap &grid_map,
-                        const std::pair<int, int> &start,
-                        const std::pair<int, int> &end) {
+
+std::optional<Path> Solution::BreadthFirstSearch(const GridMap &grid_map) {
   Path result;
-  // BFS implementation to find the path from start to end
-  // ...
+  if (grid_map.grid.empty()) {
+    std::cout << "[Solution] grid_map is empty !" << std::endl;
+    return std::nullopt;
+  }
+  const auto &start = grid_map.start;
+  const auto &end = grid_map.end;
+  const int rows = static_cast<int>(grid_map.grid.size());
+  const int cols = static_cast<int>(grid_map.grid[0].size());
+
+  auto is_valid = [&](const std::pair<int, int> &point) {
+    return point.first >= 0 && point.first < rows && point.second >= 0 &&
+           point.second < cols && grid_map.grid[point.first][point.second] == 0;
+  };
+
+  std::vector<std::vector<bool>> visited(rows, std::vector<bool>(cols, false));
+  std::queue<std::pair<int, int>> queue;
+  std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash>
+      parent_map;
+  queue.push(start);
+  visited[start.first][start.second] = true;
+
+  while (!queue.empty()) {
+    auto current = queue.front();
+    queue.pop();
+
+    if (current == end) {
+      std::pair<int, int> node = end;
+      while (node != start) {
+        result.push_back(node);
+        node = parent_map[node];
+      }
+      std::reverse(result.begin(), result.end());
+      return result;
+    }
+
+    for (const auto &direction : kDirections) {
+      std::pair<int, int> next(current.first + direction[0],
+                               current.second + direction[1]);
+      if (is_valid(next) && !visited[next.first][next.second]) {
+        visited[next.first][next.second] = true;
+        queue.push(next);
+        parent_map[next] = current;
+      }
+    }
+  }
+  std::cout << "[Solution] BFS failed ! Cannot find a path from " << start.first
+            << ", " << start.second << " to " << end.first << ", " << end.second
+            << std::endl;
   return result;
 }
 
@@ -233,13 +284,13 @@ bool Solution::SolveMaze(ClansFactory *factory) {
     return false;
   }
   const auto &grid_map = factory->grid_map;
-  const auto &start_point = grid_map.start;
-  const auto &end_point = grid_map.end;
-  factory->path = BreadthFirstSearch(grid_map, start_point, end_point);
-
-  std::cout << "[Solution] cannot find a path from " << start_point.first
-            << ", " << start_point.second << " to " << end_point.first << ", "
-            << end_point.second << std::endl;
+  const auto bfs_path = BreadthFirstSearch(grid_map);
+  if (bfs_path.has_value()) {
+    factory->path = bfs_path.value();
+    std::cout << "[Solution] BFS path found , length : " << factory->path.size()
+              << std::endl;
+    return true;
+  }
   return false;
 }
 

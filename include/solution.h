@@ -7,12 +7,20 @@
 #include <Eigen/Geometry>
 #include <algorithm>
 #include <opencv2/opencv.hpp>
+#include <optional>
 #include <string>
 #include <vector>
 
 namespace Practice {
 using Point = Eigen::Vector3d;
 using Polygon = std::vector<Point>;
+
+struct PairHash {
+  template <typename T1, typename T2>
+  std::size_t operator()(const std::pair<T1, T2> &pair) const {
+    return std::hash<T1>()(pair.first) ^ (std::hash<T2>()(pair.second) << 1);
+  }
+};
 class KdTree {
 public:
   explicit KdTree(const std::vector<int> &data) : data_(data) {
@@ -50,9 +58,7 @@ private:
   void SavePolyline(const Point &traj_point, const Point &direction,
                     std::string filename);
   void SavePolygon(const std::vector<Polygon> &polygons, std::string filename);
-  Path BreadthFirstSearch(const GridMap &grid_map,
-                          const std::pair<int, int> &start,
-                          const std::pair<int, int> &end);
+  std::optional<Path> BreadthFirstSearch(const GridMap &grid_map);
   void HeartBeat();
 };
 } // namespace Practice

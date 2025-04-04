@@ -1,4 +1,6 @@
 #include "COC.h"
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 namespace Practice {
 namespace {
@@ -22,6 +24,27 @@ bool ClashOfClans::SaveFiles() {
   }
   std::cout << "[COC] save map..." << std::endl;
   factory_.grid_map = map_->GetGridMap();
+  return true;
+}
+
+bool ClashOfClans::CheckPath() {
+  if (factory_.path.empty()) {
+    std::cerr << "[COC] path is empty" << std::endl;
+    return false;
+  }
+
+  nlohmann::json path_data;
+  path_data["path"] = nlohmann::json::array();
+  for (const auto &point : factory_.path) {
+    path_data["path"].push_back({{"x", point.first}, {"y", point.second}});
+  }
+  std::ofstream file("path_data.json");
+  if (!file.is_open()) {
+    std::cerr << "[COC] Failed to open path_data.json" << std::endl;
+    return false;
+  }
+  file << path_data.dump(4);
+  file.close();
   return true;
 }
 

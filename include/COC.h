@@ -17,7 +17,8 @@ public:
   ClashOfClans() = default;
   ~ClashOfClans() {}
   void Process();
-  ClansFactory GetFactory() const { return factory_; }
+  bool CheckPath();
+  ClansFactory& GetFactory() { return factory_; }
 
 private:
   bool Initialize();
