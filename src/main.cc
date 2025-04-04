@@ -4,11 +4,13 @@
 
 namespace Practice {
 void run() {
-//   Solution solution;
-//   solution.TestQuote();
-//   solution.TestPolygon();
+  Solution solution;
+  //   solution.TestQuote();
+  //   solution.TestPolygon();
   ClashOfClans coc;
   coc.Process();
+  auto factory = coc.GetFactory();
+  solution.SolveMaze(&factory);
   std::cout << "Thanks for watching!" << std::endl;
 }
 } // namespace Practice

@@ -219,4 +219,9 @@ bool Solution::IsLineCrossedWithPolygon(const Point &traj_point,
   return false;
 }
 
+bool Solution::SolveMaze(ClansFactory *factory) {
+  std::cout << "[Solution] cannot find a path !" << std::endl;
+  return false;
+}
+
 } // namespace Practice

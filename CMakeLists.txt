@@ -17,6 +17,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -march=native")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -march=native")
 
+find_package(nlohmann_json 3.10.5 REQUIRED)
 # Add OpenCV
 set(OpenCV_DIR "/home/jaysszhou/Documents/ThirdParty/opencv-3.4.17/build")
 find_package(OpenCV REQUIRED)

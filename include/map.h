@@ -8,8 +8,17 @@
 #include <vector>
 
 namespace Practice {
+struct GridMap {
+  std::vector<std::vector<int>> grid;
+  std::pair<int, int> start;
+  std::pair<int, int> end;
+
+  GridMap(std::vector<std::vector<int>> g = {}, std::pair<int, int> s = {0, 0},
+          std::pair<int, int> e = {0, 0})
+      : grid(g), start(s), end(e) {}
+};
+
 class Map {
-  using GridMap = std::vector<std::vector<int>>;
 
 public:
   Map(const int map_width, const int map_height, const double obstacle_ratio)

@@ -2,8 +2,10 @@
 #ifndef SOLUTION_H
 #define SOLUTION_H
 
+#include "COC.h"
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <algorithm>
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
@@ -38,6 +40,7 @@ public:
   void IdleStatus();
   void TestQuote();
   void TestPolygon();
+  bool SolveMaze(ClansFactory *factory);
 
 private:
   bool IsLineCrossedWithPolygon(const Point &traj_point, const Point &direction,

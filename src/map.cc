@@ -14,7 +14,9 @@ constexpr int kEmpty = 0;
 
 bool Map::Initialize() {
   std::cout << "Initializing map..." << std::endl;
-  grid_map_.resize(map_height_, std::vector<int>(map_width_, kEmpty));
+  grid_map_.grid.resize(map_height_, std::vector<int>(map_width_, kEmpty));
+  grid_map_.start = {0, 0};                          // 起点
+  grid_map_.end = {map_width_ - 1, map_height_ - 1}; // 终点
   return true;
 }
 
@@ -23,15 +25,20 @@ void Map::BuildMap() {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<float> dis(0.0, 1.0);
-
+  int obstacle_count = 0;
   // 随机放置障碍物
   for (int y = 0; y < map_height_; ++y) {
     for (int x = 0; x < map_width_; ++x) {
       if (dis(gen) < obstacle_ratio_) {
-        grid_map_[y][x] = kObstacle;
+        grid_map_.grid[y][x] = kObstacle;
+        ++obstacle_count;
       }
     }
   }
+  const double obstacle_ratio =
+      static_cast<double>(obstacle_count) / (map_width_ * map_height_);
+  std::cout << "Obstacle count: " << obstacle_count
+            << " , ratio : " << obstacle_ratio << std::endl;
 }
 
 void Map::Visualize() {
@@ -43,7 +50,7 @@ void Map::Visualize() {
   for (int y = 0; y < map_height_; ++y) {
     std::vector<int> row;
     for (int x = 0; x < map_width_; ++x) {
-      row.push_back(grid_map_[y][x] == kObstacle ? 1 : 0);
+      row.push_back(grid_map_.grid[y][x] == kObstacle ? 1 : 0);
     }
     map_data["grid"].push_back(row);
   }
