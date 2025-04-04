@@ -9,11 +9,14 @@ void run() {
   //   solution.TestPolygon();
   ClashOfClans coc;
   coc.Process();
-  auto& factory = coc.GetFactory();
-  if(solution.SolveMaze(&factory) && coc.CheckPath()){
-    std::cout << "[Solution] Solve maze successfully!" << std::endl;
+  auto &factory = coc.GetFactory();
+  if (solution.SolveMazeByBFS(&factory) && coc.CheckPath()) {
+    std::cout << "[Solution] Solve maze by BFS successfully!" << std::endl;
   }
-  
+  if (solution.SolveMazeByDFS(&factory) && coc.CheckPath()) {
+    std::cout << "[Solution] Solve maze by DFS successfully!" << std::endl;
+  }
+
   std::cout << "Thanks for watching!" << std::endl;
 }
 } // namespace Practice

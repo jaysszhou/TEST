@@ -5,6 +5,7 @@
 #include <random>
 #include <thread>
 #include <vector>
+#include <stack>
 
 namespace Practice {
 namespace {
@@ -279,7 +280,7 @@ std::optional<Path> Solution::BreadthFirstSearch(const GridMap &grid_map) {
   return result;
 }
 
-bool Solution::SolveMaze(ClansFactory *factory) {
+bool Solution::SolveMazeByBFS(ClansFactory *factory) {
   if (!factory) {
     std::cout << "[Solution] factory is nullptr !" << std::endl;
     return false;
@@ -289,6 +290,75 @@ bool Solution::SolveMaze(ClansFactory *factory) {
   if (bfs_path.has_value()) {
     factory->path = bfs_path.value();
     std::cout << "[Solution] BFS path found , length : " << factory->path.size()
+              << std::endl;
+    return true;
+  }
+  return false;
+}
+
+std::optional<Path> Solution::DepthFirstSearch(const GridMap &grid_map) {
+  Path result;
+  if (grid_map.grid.empty()) {
+    std::cout << "[Solution] grid_map is empty !" << std::endl;
+    return std::nullopt;
+  }
+  const auto &start = grid_map.start;
+  const auto &end = grid_map.end;
+  const int rows = static_cast<int>(grid_map.grid.size());
+  const int cols = static_cast<int>(grid_map.grid[0].size());
+
+  auto is_valid = [&](const std::pair<int, int> &point) {
+    return point.first >= 0 && point.first < rows && point.second >= 0 &&
+           point.second < cols && grid_map.grid[point.first][point.second] == 0;
+  };
+
+  std::vector<std::vector<bool>> visited(rows, std::vector<bool>(cols, false));
+  std::stack<std::pair<int, int>> stack;
+  std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash>
+      parent_map;
+  stack.push(start);
+  visited[start.first][start.second] = true;
+  while (!stack.empty()) {
+    auto current = stack.top();
+    stack.pop();
+
+    if (current == end) {
+      std::pair<int, int> node = end;
+      while (node != start) {
+        result.push_back(node);
+        node = parent_map[node];
+      }
+      result.push_back(start);
+      std::reverse(result.begin(), result.end());
+      return result;
+    }
+
+    for (const auto &direction : kDirections) {
+      std::pair<int, int> next(current.first + direction[0],
+                               current.second + direction[1]);
+      if (is_valid(next) && !visited[next.first][next.second]) {
+        visited[next.first][next.second] = true;
+        stack.push(next);
+        parent_map[next] = current;
+      }
+    }
+  }
+  std::cout << "[Solution] DFS failed ! Cannot find a path from " << start.first
+            << ", " << start.second << " to " << end.first << ", " << end.second
+            << std::endl;
+  return result;
+}
+
+bool Solution::SolveMazeByDFS(ClansFactory *factory) {
+  if (!factory) {
+    std::cout << "[Solution] factory is nullptr !" << std::endl;
+    return false;
+  }
+  const auto &grid_map = factory->grid_map;
+  const auto dfs_path = DepthFirstSearch(grid_map);
+  if (dfs_path.has_value()) {
+    factory->path = dfs_path.value();
+    std::cout << "[Solution] DFS path found , length : " << factory->path.size()
               << std::endl;
     return true;
   }
