@@ -41,6 +41,11 @@ def visualize_map():
     ax.scatter(start[1], start[0], color='green', s=100, label='Start')  # 起点用绿色标记
     ax.scatter(end[1], end[0], color='red', s=100, label='End')  # 终点用红色标记
 
+    # 保存仅包含地图的图像
+    plt.title(f"Map Visualization\nSize: {data['width']}x{data['height']}")
+    plt.tight_layout()
+    plt.savefig('map.png', dpi=300)  # 保存仅包含地图的图像
+
     # 绘制路径
     if path:
         path_points = [(point['y'], point['x']) for point in path]  # 转换为 (row, col) 格式
@@ -50,12 +55,8 @@ def visualize_map():
     # 添加图例
     ax.legend(loc='upper right')
     
-    # 添加标题和信息
-    plt.title(f"Map Visualization\nSize: {data['width']}x{data['height']}")
-    plt.tight_layout()
-    
-    # 保存并显示图像
-    plt.savefig('map_visualization_with_path.png', dpi=300)
+    # 保存包含路径的图像
+    plt.savefig('map_with_path.png', dpi=300)  # 保存包含路径的图像
     plt.show()
 
 if __name__ == "__main__":
