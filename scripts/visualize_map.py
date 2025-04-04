@@ -26,6 +26,11 @@ def visualize_map():
     # 隐藏主刻度标签
     ax.tick_params(which='major', bottom=False, left=False, labelbottom=False, labelleft=False)
     
+    start = (0, 0)  # 起点
+    end = (data['height'] - 1, data['width'] - 1)  # 终点
+    ax.scatter(start[1], start[0], color='green', s=100, label='Start')  # 起点用绿色标记
+    ax.scatter(end[1], end[0], color='red', s=100, label='End')  # 终点用红色标记
+    
     # 添加标题和信息
     plt.title(f"Map Visualization\nSize: {data['width']}x{data['height']}")
     plt.tight_layout()

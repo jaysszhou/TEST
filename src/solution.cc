@@ -218,9 +218,28 @@ bool Solution::IsLineCrossedWithPolygon(const Point &traj_point,
   }
   return false;
 }
+Path Solution::BreadthFirstSearch(const GridMap &grid_map,
+                        const std::pair<int, int> &start,
+                        const std::pair<int, int> &end) {
+  Path result;
+  // BFS implementation to find the path from start to end
+  // ...
+  return result;
+}
 
 bool Solution::SolveMaze(ClansFactory *factory) {
-  std::cout << "[Solution] cannot find a path !" << std::endl;
+  if (!factory) {
+    std::cout << "[Solution] factory is nullptr !" << std::endl;
+    return false;
+  }
+  const auto &grid_map = factory->grid_map;
+  const auto &start_point = grid_map.start;
+  const auto &end_point = grid_map.end;
+  factory->path = BreadthFirstSearch(grid_map, start_point, end_point);
+
+  std::cout << "[Solution] cannot find a path from " << start_point.first
+            << ", " << start_point.second << " to " << end_point.first << ", "
+            << end_point.second << std::endl;
   return false;
 }
 

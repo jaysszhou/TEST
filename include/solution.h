@@ -50,6 +50,9 @@ private:
   void SavePolyline(const Point &traj_point, const Point &direction,
                     std::string filename);
   void SavePolygon(const std::vector<Polygon> &polygons, std::string filename);
+  Path BreadthFirstSearch(const GridMap &grid_map,
+                          const std::pair<int, int> &start,
+                          const std::pair<int, int> &end);
   void HeartBeat();
 };
 } // namespace Practice

@@ -13,7 +13,7 @@ constexpr int kEmpty = 0;
 } // namespace
 
 bool Map::Initialize() {
-  std::cout << "Initializing map..." << std::endl;
+  std::cout << "[Map] Initializing map..." << std::endl;
   grid_map_.grid.resize(map_height_, std::vector<int>(map_width_, kEmpty));
   grid_map_.start = {0, 0};                          // 起点
   grid_map_.end = {map_width_ - 1, map_height_ - 1}; // 终点
@@ -35,9 +35,15 @@ void Map::BuildMap() {
       }
     }
   }
+  if (grid_map_.grid[0][0] == kObstacle) {
+    grid_map_.grid[0][0] = kEmpty;
+  }
+  if (grid_map_.grid[map_height_ - 1][map_width_ - 1] == kObstacle) {
+    grid_map_.grid[map_height_ - 1][map_width_ - 1] = kEmpty;
+  }
   const double obstacle_ratio =
       static_cast<double>(obstacle_count) / (map_width_ * map_height_);
-  std::cout << "Obstacle count: " << obstacle_count
+  std::cout << "[Map] Obstacle count: " << obstacle_count
             << " , ratio : " << obstacle_ratio << std::endl;
 }
 
@@ -64,14 +70,49 @@ void Map::Visualize() {
   system("python3 ../scripts/visulize_map.py");
 }
 
+bool Map::LoadMap() {
+  const std::string filename =
+      "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/map_data.json";
+  std::ifstream file(filename);
+  if (!file.is_open()) {
+    std::cerr << "[Map] Failed to open map_data.json" << std::endl;
+    return false;
+  }
+
+  nlohmann::json map_data;
+  file >> map_data;
+  file.close();
+
+  map_width_ = map_data["width"];
+  map_height_ = map_data["height"];
+  grid_map_.grid.resize(map_height_, std::vector<int>(map_width_));
+
+  const auto &grid = map_data["grid"];
+  for (int y = 0; y < map_height_; ++y) {
+    for (int x = 0; x < map_width_; ++x) {
+      grid_map_.grid[y][x] = grid[y][x];
+    }
+  }
+
+  // 设置起点和终点
+  grid_map_.start = {0, 0};
+  grid_map_.end = {map_width_ - 1, map_height_ - 1};
+
+  std::cout << "[Map] Map loaded successfully from map_data.json" << std::endl;
+  return true;
+}
+
 void Map::Process() {
   if (!Initialize()) {
-    std::cerr << "Failed to initialize map." << std::endl;
+    std::cerr << "[Map] Failed to initialize map." << std::endl;
     return;
   }
-  BuildMap();
+  if (!LoadMap()) {
+    std::cerr << "[Map] Failed to load map, build a new map." << std::endl;
+    BuildMap();
+  }
 
   Visualize();
-  std::cout << "Map processing completed." << std::endl;
+  std::cout << "[Map] Map processing completed." << std::endl;
 }
 } // namespace Practice

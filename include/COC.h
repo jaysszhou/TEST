@@ -5,10 +5,12 @@
 #include <memory>
 
 namespace Practice {
+using Path = std::vector<std::pair<int, int>>;
 struct ClansFactory {
-  ClansFactory() : grid_map() {};
+  ClansFactory() : grid_map(), path() {};
   ClansFactory(const GridMap &grid_map) : grid_map(grid_map) {};
   GridMap grid_map;
+  Path path;
 };
 class ClashOfClans {
 public:

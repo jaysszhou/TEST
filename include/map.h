@@ -35,6 +35,7 @@ public:
 private:
   bool Initialize();
   void BuildMap();
+  bool LoadMap();
   void Visualize();
 
 private:
