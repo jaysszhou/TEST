@@ -27,7 +27,7 @@ bool ClashOfClans::SaveFiles() {
   return true;
 }
 
-bool ClashOfClans::CheckPath() {
+bool ClashOfClans::CheckPath(const std::string method_name) {
   if (factory_.path.empty()) {
     std::cerr << "[COC] path is empty" << std::endl;
     return false;
@@ -38,7 +38,8 @@ bool ClashOfClans::CheckPath() {
   for (const auto &point : factory_.path) {
     path_data["path"].push_back({{"x", point.first}, {"y", point.second}});
   }
-  std::ofstream file("path_data.json");
+  std::string path_name = "path_" + method_name + ".json";
+  std::ofstream file(path_name);
   if (!file.is_open()) {
     std::cerr << "[COC] Failed to open path_data.json" << std::endl;
     return false;

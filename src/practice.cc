@@ -8,10 +8,10 @@ void Practice::run() {
   ClashOfClans coc;
   coc.Process();
   auto &factory = coc.GetFactory();
-  if (solution.SolveMazeByBFS(&factory) && coc.CheckPath()) {
+  if (solution.SolveMazeByBFS(&factory) && coc.CheckPath("BFS")) {
     std::cout << "[Solution] Solve maze by BFS successfully!" << std::endl;
   }
-  if (solution.SolveMazeByDFS(&factory) && coc.CheckPath()) {
+  if (solution.SolveMazeByDFS(&factory) && coc.CheckPath("DFS")) {
     std::cout << "[Solution] Solve maze by DFS successfully!" << std::endl;
   }
 
