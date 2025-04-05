@@ -47,6 +47,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
 # Add the shared library
 add_library(${PROJECT_NAME} SHARED
     src/main.cc
+    src/practice.cc
     src/solution.cc
     src/map.cc
     src/COC.cc
