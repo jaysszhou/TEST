@@ -3,9 +3,9 @@
 #include <chrono>
 #include <iostream>
 #include <random>
+#include <stack>
 #include <thread>
 #include <vector>
-#include <stack>
 
 namespace Practice {
 namespace {
@@ -19,11 +19,11 @@ constexpr int kDirections[4][2] = {
     {-1, 0}, // left
 };
 
-Eigen::Vector2d ToGridMapCoordinate(const Point &point) {
+Eigen::Vector2d ToGridMapCoordinate(const Solution::Point &point) {
   return {std::round(point.x() / kGridSize), std::round(point.y() / kGridSize)};
 }
 
-std::vector<Eigen::Vector2d> GetGridMap(const Polygon &rect,
+std::vector<Eigen::Vector2d> GetGridMap(const Solution::Polygon &rect,
                                         const double gridSize) {
   std::vector<Eigen::Vector2d> grid_cells;
   const Eigen::Vector2d &point_a = {rect[0].x(), rect[0].y()};
@@ -48,11 +48,11 @@ std::vector<Eigen::Vector2d> GetGridMap(const Polygon &rect,
   return grid_cells;
 }
 
-std::vector<Eigen::Vector2d> GetPolyline(const Point &traj_point,
-                                         const Point &direction) {
+std::vector<Eigen::Vector2d> GetPolyline(const Solution::Point &traj_point,
+                                         const Solution::Point &direction) {
   std::vector<Eigen::Vector2d> polyline;
   for (double length = 0; length <= 5.0; length += kStep) {
-    const Point &point = traj_point + length * direction;
+    const auto &point = traj_point + length * direction;
     const auto &point_in_grid_map = ToGridMapCoordinate(point);
     polyline.push_back(point_in_grid_map);
   }
@@ -138,14 +138,14 @@ void Solution::TestQuote() {
 }
 
 void Solution::TestPolygon() {
-  Point traj_point(0, 0, 0);
-  Point direction(1, 1.5, 0);
+  Solution::Point traj_point(0, 0, 0);
+  Solution::Point direction(1, 1.5, 0);
   direction.normalize();
   SavePolyline(
       traj_point, direction,
       "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/polyline.txt");
-  std::vector<Polygon> polygons;
-  Polygon polygon;
+  std::vector<Solution::Polygon> polygons;
+  Solution::Polygon polygon;
   polygon.push_back(Point(1, 0, 0));
   polygon.push_back(Point(3, 0, 0));
   polygon.push_back(Point(3, 4, 0));
@@ -164,7 +164,7 @@ void Solution::TestPolygon() {
   return;
 }
 
-void Solution::SavePolygon(const std::vector<Polygon> &polygons,
+void Solution::SavePolygon(const std::vector<Solution::Polygon> &polygons,
                            std::string filename) {
   std::ofstream file(filename);
   for (const auto &polygon : polygons) {
@@ -177,7 +177,8 @@ void Solution::SavePolygon(const std::vector<Polygon> &polygons,
   file.close();
 }
 
-void Solution::SavePolyline(const Point &traj_point, const Point &direction,
+void Solution::SavePolyline(const Solution::Point &traj_point,
+                            const Solution::Point &direction,
                             std::string filename) {
   std::vector<Eigen::Vector2d> polyline = GetPolyline(traj_point, direction);
   std::ofstream file(filename);
@@ -196,9 +197,9 @@ void Solution::Save2dPoints(const std::vector<Eigen::Vector2d> &points,
   file.close();
 }
 
-bool Solution::IsLineCrossedWithPolygon(const Point &traj_point,
-                                        const Point &direction,
-                                        const std::vector<Polygon> &polygons) {
+bool Solution::IsLineCrossedWithPolygon(
+    const Solution::Point &traj_point, const Solution::Point &direction,
+    const std::vector<Solution::Polygon> &polygons) {
   auto is_point_in_grid_map =
       [&](const Point &point,
           const std::vector<Eigen::Vector2d> &grid_cells) -> bool {
@@ -217,7 +218,7 @@ bool Solution::IsLineCrossedWithPolygon(const Point &traj_point,
         grid_cells,
         "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/grid_cells.txt");
     for (double length = 0; length <= 5.0; length += kStep) {
-      Point point = traj_point + length * direction;
+      Solution::Point point = traj_point + length * direction;
       if (is_point_in_grid_map(point, grid_cells)) {
         return true;
       }

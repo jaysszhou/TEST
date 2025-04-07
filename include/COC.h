@@ -8,7 +8,7 @@ namespace Practice {
 using Path = std::vector<std::pair<int, int>>;
 struct ClansFactory {
   ClansFactory() : grid_map(), path() {};
-  ClansFactory(const GridMap &grid_map) : grid_map(grid_map) {};
+  ClansFactory(const GridMap &grid_map) : grid_map(grid_map), path() {};
   GridMap grid_map;
   Path path;
 };
@@ -17,8 +17,8 @@ public:
   ClashOfClans() = default;
   ~ClashOfClans() {}
   void Process();
-  bool CheckPath();
-  ClansFactory& GetFactory() { return factory_; }
+  bool CheckPath(const std::string method_name);
+  ClansFactory &GetFactory() { return factory_; }
 
 private:
   bool Initialize();
