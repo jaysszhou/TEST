@@ -53,6 +53,7 @@ public:
   void TestPolygon();
   bool SolveMazeByBFS(ClansFactory *factory);
   bool SolveMazeByDFS(ClansFactory *factory);
+  bool SolveMazeByAStar(ClansFactory *factory);
 
 private:
   bool IsLineCrossedWithPolygon(const Point &traj_point, const Point &direction,
@@ -64,6 +65,7 @@ private:
   void SavePolygon(const std::vector<Polygon> &polygons, std::string filename);
   std::optional<Path> BreadthFirstSearch(const GridMap &grid_map);
   std::optional<Path> DepthFirstSearch(const GridMap &grid_map);
+  std::optional<Path> AStarSearch(const GridMap &grid_map);
   void HeartBeat();
 };
 } // namespace Practice

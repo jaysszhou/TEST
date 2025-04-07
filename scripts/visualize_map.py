@@ -17,6 +17,10 @@ def load_path_bfs_data():
 def load_path_dfs_data():
     with open("../out/path_DFS.json", "r") as f:
         return json.load(f)
+    
+def load_path_a_star_data():
+    with open("../out/path_A*.json", "r") as f:
+        return json.load(f)
 
 
 def visualize_map():
@@ -30,6 +34,9 @@ def visualize_map():
 
     path_dfs_data = load_path_dfs_data()
     path_dfs = path_dfs_data["path"]
+    
+    path_a_star_data = load_path_a_star_data()
+    path_a_star = path_a_star_data["path"]
 
     # 创建自定义颜色映射
     cmap = colors.ListedColormap(["white", "black"])  # 0=白色(空地), 1=黑色(障碍)
@@ -76,6 +83,14 @@ def visualize_map():
         path_y, path_x = zip(*path_points)
         ax.plot(
             path_x, path_y, color="orange", linestyle=":", linewidth=5, label="path_dfs"
+        )
+        
+    if path_a_star_data:
+        path_a_star = path_a_star_data["path"]
+        path_points = [(point["x"], point["y"]) for point in path_a_star]
+        path_y, path_x = zip(*path_points)
+        ax.plot(
+            path_x, path_y, color="purple", linestyle="-.", linewidth=5, label="path_A*"
         )
 
     # 添加图例
