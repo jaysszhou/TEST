@@ -59,6 +59,17 @@ std::vector<Eigen::Vector2d> GetPolyline(const Solution::Point &traj_point,
   return polyline;
 }
 
+double GetPathLength(const std::vector<std::pair<int, int>> &path) {
+  double length = 0.0;
+  for (size_t i = 1; i < path.size(); ++i) {
+    const auto &point_a = path[i - 1];
+    const auto &point_b = path[i];
+    length += std::sqrt(std::pow(point_b.first - point_a.first, 2) +
+                        std::pow(point_b.second - point_a.second, 2));
+  }
+  return length;
+}
+
 }; // namespace
 
 std::vector<std::pair<int, int>> Solution::generateRandomIntervals(int k) {
@@ -229,6 +240,8 @@ bool Solution::IsLineCrossedWithPolygon(
 
 std::optional<Path> Solution::BreadthFirstSearch(const GridMap &grid_map) {
   Path result;
+  auto &result_path = result.path;
+  result.method_name = "BFS";
   if (grid_map.grid.empty()) {
     std::cout << "[Solution] grid_map is empty !" << std::endl;
     return std::nullopt;
@@ -257,11 +270,12 @@ std::optional<Path> Solution::BreadthFirstSearch(const GridMap &grid_map) {
     if (current == end) {
       std::pair<int, int> node = end;
       while (node != start) {
-        result.push_back(node);
+        result_path.push_back(node);
         node = parent_map[node];
       }
-      result.push_back(start);
-      std::reverse(result.begin(), result.end());
+      result_path.push_back(start);
+      std::reverse(result_path.begin(), result_path.end());
+      result.length = GetPathLength(result_path);
       return result;
     }
 
@@ -289,9 +303,9 @@ bool Solution::SolveMazeByBFS(ClansFactory *factory) {
   const auto &grid_map = factory->grid_map;
   const auto bfs_path = BreadthFirstSearch(grid_map);
   if (bfs_path.has_value()) {
-    factory->path = bfs_path.value();
-    std::cout << "[Solution] BFS path found , length : " << factory->path.size()
-              << std::endl;
+    factory->paths.emplace_back(bfs_path.value());
+    std::cout << "[Solution] BFS path found , length : "
+              << bfs_path.value().length << std::endl;
     return true;
   }
   return false;
@@ -299,6 +313,9 @@ bool Solution::SolveMazeByBFS(ClansFactory *factory) {
 
 std::optional<Path> Solution::DepthFirstSearch(const GridMap &grid_map) {
   Path result;
+  auto &result_path = result.path;
+
+  result.method_name = "DFS";
   if (grid_map.grid.empty()) {
     std::cout << "[Solution] grid_map is empty !" << std::endl;
     return std::nullopt;
@@ -326,11 +343,12 @@ std::optional<Path> Solution::DepthFirstSearch(const GridMap &grid_map) {
     if (current == end) {
       std::pair<int, int> node = end;
       while (node != start) {
-        result.push_back(node);
+        result_path.push_back(node);
         node = parent_map[node];
       }
-      result.push_back(start);
-      std::reverse(result.begin(), result.end());
+      result_path.push_back(start);
+      std::reverse(result_path.begin(), result_path.end());
+      result.length = GetPathLength(result_path);
       return result;
     }
 
@@ -358,9 +376,9 @@ bool Solution::SolveMazeByDFS(ClansFactory *factory) {
   const auto &grid_map = factory->grid_map;
   const auto dfs_path = DepthFirstSearch(grid_map);
   if (dfs_path.has_value()) {
-    factory->path = dfs_path.value();
-    std::cout << "[Solution] DFS path found , length : " << factory->path.size()
-              << std::endl;
+    factory->paths.emplace_back(dfs_path.value());
+    std::cout << "[Solution] DFS path found , length : "
+              << dfs_path.value().length << std::endl;
     return true;
   }
   return false;

@@ -28,14 +28,25 @@ bool ClashOfClans::SaveFiles() {
 }
 
 bool ClashOfClans::CheckPath(const std::string method_name) {
-  if (factory_.path.empty()) {
+  const auto &paths = factory_.paths;
+  if (paths.empty()) {
     std::cerr << "[COC] path is empty" << std::endl;
     return false;
   }
 
   nlohmann::json path_data;
   path_data["path"] = nlohmann::json::array();
-  for (const auto &point : factory_.path) {
+
+  auto findPath = [&paths](const std::string &name) {
+    auto it = std::find_if(paths.begin(), paths.end(), [&name](const Path &a) {
+      return a.method_name == name;
+    });
+    return (it != paths.end()) ? it->path : std::vector<std::pair<int, int>>{};
+  };
+
+  auto path = findPath(method_name);
+
+  for (const auto &point : path) {
     path_data["path"].push_back({{"x", point.first}, {"y", point.second}});
   }
   std::string path_name = "path_" + method_name + ".json";
