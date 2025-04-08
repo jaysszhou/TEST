@@ -24,6 +24,7 @@ void Practice::run() {
   } else {
     std::cout << "[Solution] Solve maze by A* failed!" << std::endl;
   }
+  coc.Evaluate();
 
   std::cout << "Thanks for watching!" << std::endl;
 }

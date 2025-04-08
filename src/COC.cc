@@ -76,4 +76,21 @@ void ClashOfClans::Process() {
   std::cout << "[COC] ClashOfClans stop..." << std::endl;
 }
 
+void ClashOfClans::Evaluate(){
+  if(factory_.paths.empty()){
+    std::cerr << "[COC] paths is empty" << std::endl;
+    return;
+  }
+  double min_length = std::numeric_limits<double>::max();
+  std::string min_path_name;
+  for(const auto& path: factory_.paths){
+    if(path.length < min_length){
+      min_length = path.length;
+      min_path_name = path.method_name;
+    }
+  }
+  std::cout << "[COC] The shortest path is " << min_path_name
+            << " with length: " << min_length << std::endl;
+}
+
 } // namespace Practice

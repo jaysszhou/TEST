@@ -21,6 +21,7 @@ public:
   ClashOfClans() = default;
   ~ClashOfClans() {}
   void Process();
+  void Evaluate();
   bool CheckPath(const std::string method_name);
   ClansFactory &GetFactory() { return factory_; }
 
