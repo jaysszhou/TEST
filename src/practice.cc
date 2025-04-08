@@ -2,6 +2,7 @@
 
 namespace Practice {
 void Practice::run() {
+  // SetLogFile();
   Solution solution;
   //   solution.TestQuote();
   //   solution.TestPolygon();
@@ -25,5 +26,18 @@ void Practice::run() {
   }
 
   std::cout << "Thanks for watching!" << std::endl;
+}
+
+void Practice::SetLogFile() {
+  const std::string log_file = "test.log";
+  static std::ofstream out(log_file);
+  if (!out.is_open()) {
+    std::cerr << "Error opening log file: " << log_file << std::endl;
+    return;
+  }
+
+  // 重定向stdout到文件
+  std::cout.rdbuf(out.rdbuf());
+  std::cerr.rdbuf(out.rdbuf());
 }
 } // namespace Practice

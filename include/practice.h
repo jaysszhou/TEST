@@ -12,6 +12,9 @@ public:
   Practice() = default;
   ~Practice() = default;
   void run();
+
+private:
+  void SetLogFile();
 };
 
 } // namespace Practice
