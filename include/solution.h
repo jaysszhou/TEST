@@ -54,6 +54,7 @@ public:
   bool SolveMazeByBFS(ClansFactory *factory);
   bool SolveMazeByDFS(ClansFactory *factory);
   bool SolveMazeByAStar(ClansFactory *factory);
+  bool SolveMazeByDijkstra(ClansFactory *factory);
 
 private:
   bool IsLineCrossedWithPolygon(const Point &traj_point, const Point &direction,
@@ -66,6 +67,7 @@ private:
   std::optional<Path> BreadthFirstSearch(const GridMap &grid_map);
   std::optional<Path> DepthFirstSearch(const GridMap &grid_map);
   std::optional<Path> AStarSearch(const GridMap &grid_map);
+  std::optional<Path> DijkstraSearch(const GridMap &grid_map);
   void HeartBeat();
 };
 } // namespace Practice

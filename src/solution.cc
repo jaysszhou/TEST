@@ -490,4 +490,100 @@ bool Solution::SolveMazeByAStar(ClansFactory *factory) {
   return false;
 }
 
+std::optional<Path> Solution::DijkstraSearch(const GridMap &grid_map) {
+  Path result;
+  auto &result_path = result.path;
+  result.method_name = "Dijkstra";
+
+  if (grid_map.grid.empty()) {
+    std::cout << "[Solution] grid_map is empty !" << std::endl;
+    return std::nullopt;
+  }
+
+  const auto &start = grid_map.start;
+  const auto &end = grid_map.end;
+  const int rows = static_cast<int>(grid_map.grid.size());
+  const int cols = static_cast<int>(grid_map.grid[0].size());
+
+  // 验证坐标是否有效
+  auto is_valid = [&](const std::pair<int, int> &point) {
+    return point.first >= 0 && point.first < rows && point.second >= 0 &&
+           point.second < cols && grid_map.grid[point.first][point.second] == 0;
+  };
+
+  // 优先队列（开放列表），存储 {g, x, y}
+  using OpenNode = std::tuple<double, int, int>;
+  std::priority_queue<OpenNode, std::vector<OpenNode>, std::greater<OpenNode>>
+      open_set;
+  open_set.emplace(0, start.first, start.second);
+
+  // 记录节点的父节点
+  std::vector<std::vector<std::pair<int, int>>> came_from(
+      rows, std::vector<std::pair<int, int>>(cols, {-1, -1}));
+
+  // g 值（起点到当前节点的实际代价）
+  std::vector<std::vector<double>> g_score(
+      rows, std::vector<double>(cols, std::numeric_limits<double>::infinity()));
+  g_score[start.first][start.second] = 0;
+
+  while (!open_set.empty()) {
+    auto [current_g, x, y] = open_set.top();
+    open_set.pop();
+
+    // 到达终点
+    if (x == end.first && y == end.second) {
+      // 重建路径
+      std::pair<int, int> current = end;
+      while (current != start) {
+        result_path.push_back(current);
+        current = came_from[current.first][current.second];
+      }
+      result_path.push_back(start);
+      std::reverse(result_path.begin(), result_path.end());
+
+      // 计算路径长度
+      result.length = g_score[x][y]; // 这里的 g_score 就是路径长度
+      return result;
+    }
+    // 遍历邻居
+    for (const auto &dir : kDirections) {
+      int nx = x + dir[0];
+      int ny = y + dir[1];
+
+      if (!is_valid({nx, ny}))
+        continue;
+
+      // 计算新的 g 值（假设每步代价为1）
+      double tentative_g = g_score[x][y] + 1;
+
+      // 如果找到更优路径
+      if (tentative_g < g_score[nx][ny]) {
+        came_from[nx][ny] = {x, y};
+        g_score[nx][ny] = tentative_g;
+        open_set.emplace(tentative_g, nx, ny);
+      }
+    }
+  }
+  std::cout << "[Solution] Dijkstra failed ! Cannot find a path from "
+            << start.first << ", " << start.second << " to " << end.first
+            << ", " << end.second << std::endl;
+  return std::nullopt;
+}
+
+bool Solution::SolveMazeByDijkstra(ClansFactory *factory) {
+  if (!factory) {
+    std::cout << "[Solution] factory is nullptr !" << std::endl;
+    return false;
+  }
+  const auto &grid_map = factory->grid_map;
+  const auto dijkstra_path = DijkstraSearch(grid_map);
+  if (dijkstra_path.has_value()) {
+    factory->paths.emplace_back(dijkstra_path.value());
+    std::cout << "[Solution] Dijkstra path found , length : "
+              << dijkstra_path.value().length << std::endl;
+    return true;
+  }
+  return false;
+}
+
 } // namespace Practice

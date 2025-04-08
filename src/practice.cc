@@ -14,15 +14,23 @@ void Practice::run() {
   } else {
     std::cout << "[Solution] Solve maze by BFS failed!" << std::endl;
   }
+
   if (solution.SolveMazeByDFS(&factory) && coc.CheckPath("DFS")) {
     std::cout << "[Solution] Solve maze by DFS successfully!" << std::endl;
   } else {
     std::cout << "[Solution] Solve maze by DFS failed!" << std::endl;
   }
+
   if (solution.SolveMazeByAStar(&factory) && coc.CheckPath("A*")) {
     std::cout << "[Solution] Solve maze by A* successfully!" << std::endl;
   } else {
     std::cout << "[Solution] Solve maze by A* failed!" << std::endl;
+  }
+
+  if (solution.SolveMazeByDijkstra(&factory) && coc.CheckPath("Dijkstra")) {
+    std::cout << "[Solution] Solve maze by Dijkstra successfully!" << std::endl;
+  } else {
+    std::cout << "[Solution] Solve maze by Dijkstra failed!" << std::endl;
   }
   coc.Evaluate();
 

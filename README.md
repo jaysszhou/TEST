@@ -2,6 +2,7 @@
 1. Breadth First Search (BFS)
 2. Depth First Search (DFS)
 3. A* search 
+4. Dijkstra search
  
 **2. build the project**
 ```bash
