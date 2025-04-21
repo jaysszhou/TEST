@@ -13,7 +13,7 @@ constexpr int kEmpty = 0;
 } // namespace
 
 bool Map::Initialize() {
-  std::cout << "[Map] Initializing map..." << std::endl;
+  LOG(INFO) << "[Map] Initializing map..." << std::endl;
   grid_map_.grid.resize(map_height_, std::vector<int>(map_width_, kEmpty));
   grid_map_.start = {0, 0};                          // 起点
   grid_map_.end = {map_width_ - 1, map_height_ - 1}; // 终点
@@ -43,7 +43,7 @@ void Map::BuildMap() {
   }
   const double obstacle_ratio =
       static_cast<double>(obstacle_count) / (map_width_ * map_height_);
-  std::cout << "[Map] Obstacle count: " << obstacle_count
+  LOG(INFO) << "[Map] Obstacle count: " << obstacle_count
             << " , ratio : " << obstacle_ratio << std::endl;
 }
 
@@ -98,7 +98,7 @@ bool Map::LoadMap() {
   grid_map_.start = {0, 0};
   grid_map_.end = {map_width_ - 1, map_height_ - 1};
 
-  std::cout << "[Map] Map loaded successfully from map_data.json" << std::endl;
+  LOG(INFO) << "[Map] Map loaded successfully from map_data.json" << std::endl;
   return true;
 }
 
@@ -113,6 +113,6 @@ void Map::Process() {
   }
 
   Visualize();
-  std::cout << "[Map] Map processing completed." << std::endl;
+  LOG(INFO) << "[Map] Map processing completed." << std::endl;
 }
 } // namespace Practice

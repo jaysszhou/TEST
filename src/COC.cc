@@ -13,7 +13,7 @@ bool ClashOfClans::Initialize() {
   map_ = std::make_unique<Map>(kMapWidth, kMapHeight, kObstacleRatio);
   GridMap init_map;
   factory_ = ClansFactory(init_map);
-  std::cout << "[test] ClashOfClans initialized." << std::endl;
+  LOG(INFO) << "[test] ClashOfClans initialized." << std::endl;
   return true;
 }
 
@@ -22,7 +22,7 @@ bool ClashOfClans::SaveFiles() {
     std::cerr << "[COC] map_ is nullptr" << std::endl;
     return false;
   }
-  std::cout << "[COC] save map..." << std::endl;
+  LOG(INFO) << "[COC] save map..." << std::endl;
   factory_.grid_map = map_->GetGridMap();
   return true;
 }
@@ -61,19 +61,19 @@ bool ClashOfClans::CheckPath(const std::string method_name) {
 }
 
 void ClashOfClans::Process() {
-  std::cout << "[COC] ClashOfClans start..." << std::endl;
+  LOG(INFO) << "[COC] ClashOfClans start..." << std::endl;
   if (!Initialize()) {
     std::cerr << "[COC] Failed to init COC." << std::endl;
     return;
   }
-  std::cout << "[COC] process map..." << std::endl;
+  LOG(INFO) << "[COC] process map..." << std::endl;
   map_->Process();
 
   if (!SaveFiles()) {
     std::cerr << "[COC] Failed to save files." << std::endl;
     return;
   }
-  std::cout << "[COC] ClashOfClans stop..." << std::endl;
+  LOG(INFO) << "[COC] ClashOfClans stop..." << std::endl;
 }
 
 void ClashOfClans::Evaluate(){
@@ -89,7 +89,7 @@ void ClashOfClans::Evaluate(){
       min_path_name = path.method_name;
     }
   }
-  std::cout << "[COC] The shortest path is " << min_path_name
+  LOG(INFO) << "[COC] The shortest path is " << min_path_name
             << " with length: " << min_length << std::endl;
 }
 

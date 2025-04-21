@@ -10,31 +10,31 @@ void Practice::run() {
   coc.Process();
   auto &factory = coc.GetFactory();
   if (solution.SolveMazeByBFS(&factory) && coc.CheckPath("BFS")) {
-    std::cout << "[Solution] Solve maze by BFS successfully!" << std::endl;
+    LOG(INFO) << "[Solution] Solve maze by BFS successfully!" << std::endl;
   } else {
-    std::cout << "[Solution] Solve maze by BFS failed!" << std::endl;
+    LOG(INFO) << "[Solution] Solve maze by BFS failed!" << std::endl;
   }
 
   if (solution.SolveMazeByDFS(&factory) && coc.CheckPath("DFS")) {
-    std::cout << "[Solution] Solve maze by DFS successfully!" << std::endl;
+    LOG(INFO) << "[Solution] Solve maze by DFS successfully!" << std::endl;
   } else {
-    std::cout << "[Solution] Solve maze by DFS failed!" << std::endl;
+    LOG(INFO) << "[Solution] Solve maze by DFS failed!" << std::endl;
   }
 
   if (solution.SolveMazeByAStar(&factory) && coc.CheckPath("A*")) {
-    std::cout << "[Solution] Solve maze by A* successfully!" << std::endl;
+    LOG(INFO) << "[Solution] Solve maze by A* successfully!" << std::endl;
   } else {
-    std::cout << "[Solution] Solve maze by A* failed!" << std::endl;
+    LOG(INFO) << "[Solution] Solve maze by A* failed!" << std::endl;
   }
 
   if (solution.SolveMazeByDijkstra(&factory) && coc.CheckPath("Dijkstra")) {
-    std::cout << "[Solution] Solve maze by Dijkstra successfully!" << std::endl;
+    LOG(INFO) << "[Solution] Solve maze by Dijkstra successfully!" << std::endl;
   } else {
-    std::cout << "[Solution] Solve maze by Dijkstra failed!" << std::endl;
+    LOG(INFO) << "[Solution] Solve maze by Dijkstra failed!" << std::endl;
   }
   coc.Evaluate();
 
-  std::cout << "Thanks for watching!" << std::endl;
+  LOG(INFO) << "Thanks for watching!" << std::endl;
 }
 
 void Practice::SetLogFile() {
@@ -46,7 +46,7 @@ void Practice::SetLogFile() {
   }
 
   // 重定向stdout到文件
-  std::cout.rdbuf(out.rdbuf());
+  LOG(INFO).rdbuf(out.rdbuf());
   std::cerr.rdbuf(out.rdbuf());
 }
 } // namespace Practice

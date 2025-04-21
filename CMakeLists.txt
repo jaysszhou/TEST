@@ -32,6 +32,8 @@ message(STATUS "Eigen3 LIBS: " ${EIGEN3_LIBS})
 # Add Pangolin
 find_package(Pangolin REQUIRED)
 
+find_package(glog REQUIRED)
+
 # Include directories
 include_directories(
     ${PROJECT_SOURCE_DIR}
@@ -58,11 +60,14 @@ target_link_libraries(${PROJECT_NAME}
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}
+    glog::glog
 )
 
 # Build examples
 add_executable(test example/test.cc)
-target_link_libraries(test ${PROJECT_NAME})
+target_link_libraries(test ${PROJECT_NAME}
+glog::glog)
 
 add_executable(run src/main.cc)
-target_link_libraries(run ${PROJECT_NAME})
+target_link_libraries(run ${PROJECT_NAME}
+glog::glog)

@@ -3,6 +3,7 @@
 #define POLYMORPHIC_H
 #include "map.h"
 #include <memory>
+#include <glog/logging.h>
 
 namespace Practice {
 struct Path {

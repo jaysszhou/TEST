@@ -4,6 +4,7 @@
 
 #include "COC.h"
 #include "solution.h"
+#include <glog/logging.h>
 #include <iostream>
 
 namespace Practice {

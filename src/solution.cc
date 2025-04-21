@@ -118,7 +118,7 @@ void Solution::IdleStatus() { HeartBeat(); }
 
 void Solution::HeartBeat() {
   while (true) {
-    std::cout << " Heart beat !" << std::endl;
+    LOG(INFO) << " Heart beat !" << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(5));
   }
 }
@@ -128,13 +128,13 @@ void Solution::TestQuote() {
   data.reserve(1);
   data = {1, 2, 3};
   KdTree kdTree(data);
-  std::cout << "Vector address before push_back: " << data.data() << std::endl;
+  LOG(INFO) << "Vector address before push_back: " << data.data() << std::endl;
 
   // **强制 vector 重新分配**
   for (int i = 0; i < 100; i++) {
     data.push_back(i);
   }
-  std::cout << "Vector address after push_back: " << data.data() << std::endl;
+  LOG(INFO) << "Vector address after push_back: " << data.data() << std::endl;
 
   // **彻底释放 vector 内存**
   std::vector<int>().swap(data);
@@ -143,7 +143,7 @@ void Solution::TestQuote() {
   data.push_back(12);
 
   kdTree.print();
-  std::cout << " function work well !" << std::endl;
+  LOG(INFO) << " function work well !" << std::endl;
 
   return;
 }
@@ -168,9 +168,9 @@ void Solution::TestPolygon() {
   SavePolygon(polygons, filename);
 
   if (IsLineCrossedWithPolygon(traj_point, direction, polygons)) {
-    std::cout << "Line crossed with polygon!" << std::endl;
+    LOG(INFO) << "Line crossed with polygon!" << std::endl;
   } else {
-    std::cout << "Line does not crossed with polygon!" << std::endl;
+    LOG(INFO) << "Line does not crossed with polygon!" << std::endl;
   }
   return;
 }
@@ -243,7 +243,7 @@ std::optional<Path> Solution::BreadthFirstSearch(const GridMap &grid_map) {
   auto &result_path = result.path;
   result.method_name = "BFS";
   if (grid_map.grid.empty()) {
-    std::cout << "[Solution] grid_map is empty !" << std::endl;
+    LOG(INFO) << "[Solution] grid_map is empty !" << std::endl;
     return std::nullopt;
   }
   const auto &start = grid_map.start;
@@ -289,7 +289,7 @@ std::optional<Path> Solution::BreadthFirstSearch(const GridMap &grid_map) {
       }
     }
   }
-  std::cout << "[Solution] BFS failed ! Cannot find a path from " << start.first
+  LOG(INFO) << "[Solution] BFS failed ! Cannot find a path from " << start.first
             << ", " << start.second << " to " << end.first << ", " << end.second
             << std::endl;
   return result;
@@ -297,14 +297,14 @@ std::optional<Path> Solution::BreadthFirstSearch(const GridMap &grid_map) {
 
 bool Solution::SolveMazeByBFS(ClansFactory *factory) {
   if (!factory) {
-    std::cout << "[Solution] factory is nullptr !" << std::endl;
+    LOG(INFO) << "[Solution] factory is nullptr !" << std::endl;
     return false;
   }
   const auto &grid_map = factory->grid_map;
   const auto bfs_path = BreadthFirstSearch(grid_map);
   if (bfs_path.has_value()) {
     factory->paths.emplace_back(bfs_path.value());
-    std::cout << "[Solution] BFS path found , length : "
+    LOG(INFO) << "[Solution] BFS path found , length : "
               << bfs_path.value().length << std::endl;
     return true;
   }
@@ -317,7 +317,7 @@ std::optional<Path> Solution::DepthFirstSearch(const GridMap &grid_map) {
 
   result.method_name = "DFS";
   if (grid_map.grid.empty()) {
-    std::cout << "[Solution] grid_map is empty !" << std::endl;
+    LOG(INFO) << "[Solution] grid_map is empty !" << std::endl;
     return std::nullopt;
   }
   const auto &start = grid_map.start;
@@ -362,7 +362,7 @@ std::optional<Path> Solution::DepthFirstSearch(const GridMap &grid_map) {
       }
     }
   }
-  std::cout << "[Solution] DFS failed ! Cannot find a path from " << start.first
+  LOG(INFO) << "[Solution] DFS failed ! Cannot find a path from " << start.first
             << ", " << start.second << " to " << end.first << ", " << end.second
             << std::endl;
   return result;
@@ -370,14 +370,14 @@ std::optional<Path> Solution::DepthFirstSearch(const GridMap &grid_map) {
 
 bool Solution::SolveMazeByDFS(ClansFactory *factory) {
   if (!factory) {
-    std::cout << "[Solution] factory is nullptr !" << std::endl;
+    LOG(INFO) << "[Solution] factory is nullptr !" << std::endl;
     return false;
   }
   const auto &grid_map = factory->grid_map;
   const auto dfs_path = DepthFirstSearch(grid_map);
   if (dfs_path.has_value()) {
     factory->paths.emplace_back(dfs_path.value());
-    std::cout << "[Solution] DFS path found , length : "
+    LOG(INFO) << "[Solution] DFS path found , length : "
               << dfs_path.value().length << std::endl;
     return true;
   }
@@ -390,7 +390,7 @@ std::optional<Path> Solution::AStarSearch(const GridMap &grid_map) {
   result.method_name = "A*";
 
   if (grid_map.grid.empty()) {
-    std::cout << "[Solution] grid_map is empty !" << std::endl;
+    LOG(INFO) << "[Solution] grid_map is empty !" << std::endl;
     return std::nullopt;
   }
 
@@ -476,14 +476,14 @@ std::optional<Path> Solution::AStarSearch(const GridMap &grid_map) {
 
 bool Solution::SolveMazeByAStar(ClansFactory *factory) {
   if (!factory) {
-    std::cout << "[Solution] factory is nullptr !" << std::endl;
+    LOG(INFO) << "[Solution] factory is nullptr !" << std::endl;
     return false;
   }
   const auto &grid_map = factory->grid_map;
   const auto a_star_path = AStarSearch(grid_map);
   if (a_star_path.has_value()) {
     factory->paths.emplace_back(a_star_path.value());
-    std::cout << "[Solution] A* path found , length : "
+    LOG(INFO) << "[Solution] A* path found , length : "
               << a_star_path.value().length << std::endl;
     return true;
   }
@@ -496,7 +496,7 @@ std::optional<Path> Solution::DijkstraSearch(const GridMap &grid_map) {
   result.method_name = "Dijkstra";
 
   if (grid_map.grid.empty()) {
-    std::cout << "[Solution] grid_map is empty !" << std::endl;
+    LOG(INFO) << "[Solution] grid_map is empty !" << std::endl;
     return std::nullopt;
   }
 
@@ -564,7 +564,7 @@ std::optional<Path> Solution::DijkstraSearch(const GridMap &grid_map) {
       }
     }
   }
-  std::cout << "[Solution] Dijkstra failed ! Cannot find a path from "
+  LOG(INFO) << "[Solution] Dijkstra failed ! Cannot find a path from "
             << start.first << ", " << start.second << " to " << end.first
             << ", " << end.second << std::endl;
   return std::nullopt;
@@ -572,14 +572,14 @@ std::optional<Path> Solution::DijkstraSearch(const GridMap &grid_map) {
 
 bool Solution::SolveMazeByDijkstra(ClansFactory *factory) {
   if (!factory) {
-    std::cout << "[Solution] factory is nullptr !" << std::endl;
+    LOG(INFO) << "[Solution] factory is nullptr !" << std::endl;
     return false;
   }
   const auto &grid_map = factory->grid_map;
   const auto dijkstra_path = DijkstraSearch(grid_map);
   if (dijkstra_path.has_value()) {
     factory->paths.emplace_back(dijkstra_path.value());
-    std::cout << "[Solution] Dijkstra path found , length : "
+    LOG(INFO) << "[Solution] Dijkstra path found , length : "
               << dijkstra_path.value().length << std::endl;
     return true;
   }

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <glog/logging.h>
 
 namespace Practice {
 struct GridMap {
@@ -24,7 +25,7 @@ public:
   Map(const int map_width, const int map_height, const double obstacle_ratio)
       : map_width_(map_width), map_height_(map_height),
         obstacle_ratio_(obstacle_ratio) {
-    std::cout << "[Map] Map initialized with width: " << map_width_
+    LOG(INFO) << "[Map] Map initialized with width: " << map_width_
               << " and height: " << map_height_ << std::endl;
   }
   ~Map() {}

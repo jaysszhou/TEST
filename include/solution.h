@@ -3,6 +3,7 @@
 #define SOLUTION_H
 
 #include "COC.h"
+#include <glog/logging.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <algorithm>
@@ -16,13 +17,13 @@ namespace Practice {
 class KdTree {
 public:
   explicit KdTree(const std::vector<int> &data) : data_(data) {
-    std::cout << " build kdtree successfully! " << std::endl;
+    LOG(INFO) << " build kdtree successfully! " << std::endl;
   }
   ~KdTree() = default;
 
   void print() {
     for (const auto data : data_) {
-      std::cout << data << std::endl;
+      LOG(INFO) << data << std::endl;
     }
   }
 
