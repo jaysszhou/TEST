@@ -34,6 +34,8 @@ void Practice::run() {
   }
   coc.Evaluate();
 
+  double number = 2;
+  LOG(INFO) << std::setprecision(12)<< "[Solution] sqrt("<< number << ") = " << solution.SolveSqrt(number);
   LOG(INFO) << "Thanks for watching!" << std::endl;
 }
 

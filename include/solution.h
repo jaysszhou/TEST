@@ -56,6 +56,7 @@ public:
   bool SolveMazeByDFS(ClansFactory *factory);
   bool SolveMazeByAStar(ClansFactory *factory);
   bool SolveMazeByDijkstra(ClansFactory *factory);
+  double SolveSqrt(const double number);
 
 private:
   bool IsLineCrossedWithPolygon(const Point &traj_point, const Point &direction,
