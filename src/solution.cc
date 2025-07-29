@@ -604,4 +604,21 @@ double Solution::SolveSqrt(const double number) {
   return x_n;
 }
 
+double Solution::SolveCubeRoot(const double number) {
+  if (number < 0) {
+    LOG(INFO) << "[Solution] cnnot be negative number.";
+  }
+  size_t times = 0;
+  double x_n = number;
+  while (times < 100) {
+    double error = x_n * x_n * x_n - number;
+    if (error < kEpsilon) {
+      break;
+    } else {
+      x_n = (2 * x_n + number / (x_n * x_n)) / 3;
+      ++times;
+    }
+  }
+  return x_n;
+}
 } // namespace Practice
