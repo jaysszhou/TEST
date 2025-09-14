@@ -34,6 +34,8 @@ void Practice::run() {
   }
   coc.Evaluate();
 
+  solution.SolveRansacProblem();
+
   double number = 2;
   LOG(INFO) << std::setprecision(12)<< "[Solution] sqrt("<< number << ") = " << solution.SolveSqrt(number);
   LOG(INFO) << std::setprecision(12)<< "[Solution] cbrt("<< number << ") = " << solution.SolveCubeRoot(number);

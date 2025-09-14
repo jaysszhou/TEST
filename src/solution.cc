@@ -1,4 +1,5 @@
 #include "solution.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <chrono>
 #include <iostream>
@@ -18,6 +19,14 @@ constexpr int kDirections[4][2] = {
     {0, -1}, // down
     {-1, 0}, // left
 };
+constexpr int kRansacSamples = 100;
+constexpr double kRansacOutlierRatio = 0.3;
+constexpr int kRansacMaxIterations = 1000;
+constexpr int kMinRansacInliers = kRansacSamples * 0.6;
+constexpr int kMinDistanceThreshold = 1.0;
+constexpr int kTrueA = 2;
+constexpr int kTrueB = -3;
+constexpr int kTrueC = 1;
 
 Eigen::Vector2d ToGridMapCoordinate(const Solution::Point &point) {
   return {std::round(point.x() / kGridSize), std::round(point.y() / kGridSize)};
@@ -68,6 +77,51 @@ double GetPathLength(const std::vector<std::pair<int, int>> &path) {
                         std::pow(point_b.second - point_a.second, 2));
   }
   return length;
+}
+
+std::vector<Solution::Point2d> GenerateData(int nSamples, double outlierRatio) {
+  std::vector<Solution::Point2d> data;
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> xDist(-3.0, 3.0);
+  std::normal_distribution<> noiseDist(0.0, 0.5);
+  std::uniform_real_distribution<> outlierDist(-10.0, 10.0);
+
+  for (int i = 0; i < nSamples; ++i) {
+    double x = xDist(gen);
+    double y_true = kTrueA * x * x + kTrueB * x + kTrueC;
+    double y = y_true + noiseDist(gen);
+
+    // 添加离群点
+    if (static_cast<double>(i) / nSamples < outlierRatio) {
+      y += outlierDist(gen);
+    }
+
+    data.emplace_back(x, y);
+  }
+
+  return data;
+}
+
+RansacModelParams FitQuadratic(const std::vector<Solution::Point2d> &points) {
+  int n = points.size();
+  Eigen::MatrixXd A(n, 3);
+  Eigen::VectorXd b(n);
+
+  for (int i = 0; i < n; ++i) {
+    double x = points[i][0];
+    double y = points[i][1];
+    A(i, 0) = x * x;
+    A(i, 1) = x;
+    A(i, 2) = 1.0;
+    b(i) = y;
+  }
+
+  // 解最小二乘问题: A^T A x = A^T b
+  Eigen::Vector3d coefficients =
+      (A.transpose() * A).ldlt().solve(A.transpose() * b);
+
+  return RansacModelParams(coefficients[0], coefficients[1], coefficients[2]);
 }
 
 }; // namespace
@@ -621,4 +675,90 @@ double Solution::SolveCubeRoot(const double number) {
   }
   return x_n;
 }
+
+void Solution::SolveRansacProblem() {
+  LOG(INFO) << "[Solution] SolveRansacProblem not implemented yet."
+            << std::endl;
+  const auto random_data = GenerateData(kRansacSamples, kRansacOutlierRatio);
+
+  RansacModelParams best_model = RansacFit(random_data, kRansacMaxIterations);
+
+  Save2dPoints(
+      random_data,
+      "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/ransac_data.txt");
+
+  const double error_a = std::abs(best_model.a - kTrueA) / std::abs(kTrueA);
+  const double error_b = std::abs(best_model.b - kTrueB) / std::abs(kTrueB);
+  const double error_c = std::abs(best_model.c - kTrueC) / std::abs(kTrueC);
+
+  LOG(INFO) << "RANSAC fit result: y = " << best_model.a << "x² + "
+            << best_model.b << "x + " << best_model.c << " true a = " << kTrueA
+            << " true b = " << kTrueB << " true c = " << kTrueC << std::endl;
+  LOG(INFO) << "RANSAC fit error: a = " << error_a << " b = " << error_b
+            << " c = " << error_c << std::endl;
+  return;
+}
+
+RansacModelParams Solution::RansacFit(const std::vector<Point2d> &data,
+                                      const int maxIterations) {
+  auto distanceToCurve = [](const Point2d &p,
+                            const RansacModelParams &model) -> double {
+    // 对于二次曲线 y = ax² + bx + c
+    // 点到曲线的垂直距离为 |y - (ax² + bx + c)|
+    return std::abs(p[1] - (model.a * p[0] * p[0] + model.b * p[0] + model.c));
+  };
+
+  if (data.empty()) {
+    LOG(INFO) << "[Solution] data is empty !" << std::endl;
+    return RansacModelParams(0, 0, 0);
+  }
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> indexDist(0, data.size() - 1);
+
+  RansacModelParams bestModel(0, 0, 0);
+  std::vector<int> bestInliers;
+  size_t bestNumInliers = 0;
+
+  for (int i = 0; i < maxIterations; ++i) {
+    // 1. 随机选择 nSamples 个点
+    std::vector<Solution::Point2d> samplePoints;
+    for (int j = 0; j < kRansacSamples; ++j) {
+      int idx = indexDist(gen);
+      samplePoints.push_back(data[idx]);
+    }
+
+    // 2. 使用这些点拟合模型
+    RansacModelParams model = FitQuadratic(samplePoints);
+
+    // 3. 找出所有内点
+    std::vector<int> inlierIndices;
+    for (size_t j = 0; j < data.size(); ++j) {
+      double dist = distanceToCurve(data[j], model);
+      if (dist < kMinDistanceThreshold) {
+        inlierIndices.push_back(j);
+      }
+    }
+
+    // 4. 如果内点数量足够多，更新最佳模型
+    if (inlierIndices.size() > bestNumInliers &&
+        inlierIndices.size() >= kMinRansacInliers) {
+      bestNumInliers = inlierIndices.size();
+      bestInliers = inlierIndices;
+      bestModel = model;
+    }
+  }
+
+  // 5. 使用所有内点重新拟合最终模型
+  if (bestNumInliers > 0) {
+    std::vector<Solution::Point2d> inlierPoints;
+    for (int idx : bestInliers) {
+      inlierPoints.push_back(data[idx]);
+    }
+    bestModel = FitQuadratic(inlierPoints);
+  }
+
+  return bestModel;
+}
+
 } // namespace Practice

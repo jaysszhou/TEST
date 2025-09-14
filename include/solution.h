@@ -3,16 +3,22 @@
 #define SOLUTION_H
 
 #include "COC.h"
-#include <glog/logging.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <algorithm>
+#include <glog/logging.h>
 #include <opencv2/opencv.hpp>
 #include <optional>
 #include <string>
 #include <vector>
 
 namespace Practice {
+
+struct RansacModelParams {
+  double a, b, c;
+  RansacModelParams(const double a, const double b, const double c)
+      : a(a), b(b), c(c) {}
+};
 
 class KdTree {
 public:
@@ -34,6 +40,7 @@ private:
 class Solution {
 public:
   using Point = Eigen::Vector3d;
+  using Point2d = Eigen::Vector2d;
   using Polygon = std::vector<Point>;
 
   struct PairHash {
@@ -58,6 +65,7 @@ public:
   bool SolveMazeByDijkstra(ClansFactory *factory);
   double SolveSqrt(const double number);
   double SolveCubeRoot(const double number);
+  void SolveRansacProblem();
 
 private:
   bool IsLineCrossedWithPolygon(const Point &traj_point, const Point &direction,
@@ -71,6 +79,8 @@ private:
   std::optional<Path> DepthFirstSearch(const GridMap &grid_map);
   std::optional<Path> AStarSearch(const GridMap &grid_map);
   std::optional<Path> DijkstraSearch(const GridMap &grid_map);
+  RansacModelParams RansacFit(const std::vector<Point2d> &data,
+                              const int maxIterations);
   void HeartBeat();
 };
 } // namespace Practice
