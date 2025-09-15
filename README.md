@@ -3,6 +3,7 @@
 2. Depth First Search (DFS)
 3. A* search 
 4. Dijkstra search
+5. RANSAC
  
 **2. build the project**
 ```bash
