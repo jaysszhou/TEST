@@ -3,23 +3,20 @@
 #define SOLUTION_H
 
 #include "COC.h"
+#include "base_type.h"
+#include "kalman_filter.h"
+
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <algorithm>
 #include <glog/logging.h>
+#include <memory>
 #include <opencv2/opencv.hpp>
 #include <optional>
 #include <string>
 #include <vector>
 
 namespace Practice {
-
-struct RansacModelParams {
-  double a, b, c;
-  RansacModelParams(const double a, const double b, const double c)
-      : a(a), b(b), c(c) {}
-};
-
 class KdTree {
 public:
   explicit KdTree(const std::vector<int> &data) : data_(data) {
@@ -66,6 +63,7 @@ public:
   double SolveSqrt(const double number);
   double SolveCubeRoot(const double number);
   void SolveRansacProblem();
+  void SolveKalmanFilterProblem();
 
 private:
   bool IsLineCrossedWithPolygon(const Point &traj_point, const Point &direction,
@@ -80,8 +78,16 @@ private:
   std::optional<Path> AStarSearch(const GridMap &grid_map);
   std::optional<Path> DijkstraSearch(const GridMap &grid_map);
   RansacModelParams RansacFit(const std::vector<Point2d> &data,
-                              const int maxIterations);
+                              const int maxIterations,
+                              std::vector<Point2d> *inliers);
+  void EvaluateFitResult(const RansacModelParams &model,
+                         const std::vector<Point2d> &origin_data,
+                         const std::vector<Point2d> &inlier_points,
+                         FitResult *result);
   void HeartBeat();
+
+private:
+  std::shared_ptr<KalmanFilter> kalman_filter_ = nullptr;
 };
 } // namespace Practice
 

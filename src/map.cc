@@ -67,7 +67,7 @@ void Map::Visualize() {
   file.close();
 
   // 调用Python可视化脚本
-  system("python3 ../scripts/visulize_map.py");
+  // system("python3 ../scripts/visulize_map.py");
 }
 
 bool Map::LoadMap() {

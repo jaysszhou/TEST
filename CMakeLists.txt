@@ -53,6 +53,7 @@ add_library(${PROJECT_NAME} SHARED
     src/solution.cc
     src/map.cc
     src/COC.cc
+    src/kalman_filter.cc
 )
 
 # Link libraries to the shared library

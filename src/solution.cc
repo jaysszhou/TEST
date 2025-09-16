@@ -24,8 +24,8 @@ constexpr double kRansacOutlierRatio = 0.3;
 constexpr int kRansacMaxIterations = 1000;
 constexpr int kMinRansacInliers = kRansacSamples * 0.6;
 constexpr int kMinDistanceThreshold = 1.0;
-constexpr int kTrueA = 2;
-constexpr int kTrueB = -3;
+constexpr int kTrueA = -2;
+constexpr int kTrueB = 3;
 constexpr int kTrueC = 1;
 
 Eigen::Vector2d ToGridMapCoordinate(const Solution::Point &point) {
@@ -677,30 +677,33 @@ double Solution::SolveCubeRoot(const double number) {
 }
 
 void Solution::SolveRansacProblem() {
-  LOG(INFO) << "[Solution] SolveRansacProblem not implemented yet."
-            << std::endl;
+  LOG(INFO) << "[Solution] Solve Ransac Problem." << std::endl;
   const auto random_data = GenerateData(kRansacSamples, kRansacOutlierRatio);
 
-  RansacModelParams best_model = RansacFit(random_data, kRansacMaxIterations);
+  std::vector<Point2d> inliers;
+  RansacModelParams best_model =
+      RansacFit(random_data, kRansacMaxIterations, &inliers);
 
   Save2dPoints(
       random_data,
       "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/ransac_data.txt");
 
-  const double error_a = std::abs(best_model.a - kTrueA) / std::abs(kTrueA);
-  const double error_b = std::abs(best_model.b - kTrueB) / std::abs(kTrueB);
-  const double error_c = std::abs(best_model.c - kTrueC) / std::abs(kTrueC);
-
-  LOG(INFO) << "RANSAC fit result: y = " << best_model.a << "x² + "
-            << best_model.b << "x + " << best_model.c << " true a = " << kTrueA
-            << " true b = " << kTrueB << " true c = " << kTrueC << std::endl;
-  LOG(INFO) << "RANSAC fit error: a = " << error_a << " b = " << error_b
-            << " c = " << error_c << std::endl;
+  FitResult ransac_fit_result;
+  EvaluateFitResult(best_model, random_data, inliers, &ransac_fit_result);
+  LOG(INFO) << "[Solution] RANSAC fit model: y = " << best_model.a << "x^2 + "
+            << best_model.b << "x + " << best_model.c
+            << "RANSAC fit inlier ratio: " << ransac_fit_result.inlier_ratio
+            << " rmse: " << ransac_fit_result.rmse << std::endl;
   return;
 }
 
 RansacModelParams Solution::RansacFit(const std::vector<Point2d> &data,
-                                      const int maxIterations) {
+                                      const int maxIterations,
+                                      std::vector<Point2d> *inliers) {
+  if (!inliers) {
+    LOG(INFO) << "[Solution] inliers is nullptr !" << std::endl;
+    return RansacModelParams(0, 0, 0);
+  }
   auto distanceToCurve = [](const Point2d &p,
                             const RansacModelParams &model) -> double {
     // 对于二次曲线 y = ax² + bx + c
@@ -756,9 +759,88 @@ RansacModelParams Solution::RansacFit(const std::vector<Point2d> &data,
       inlierPoints.push_back(data[idx]);
     }
     bestModel = FitQuadratic(inlierPoints);
+    if (inliers) {
+      *inliers = inlierPoints;
+    }
   }
 
   return bestModel;
 }
 
+void Solution::EvaluateFitResult(const RansacModelParams &model,
+                                 const std::vector<Point2d> &origin_data,
+                                 const std::vector<Point2d> &inlier_points,
+                                 FitResult *result) {
+  if (origin_data.empty() || inlier_points.empty() || !result) {
+    LOG(INFO) << "[Solution] EvaluateFitResult input data is empty or result "
+                 "is nullptr."
+              << std::endl;
+    return;
+  }
+  result->inlier_ratio =
+      static_cast<double>(inlier_points.size()) / origin_data.size();
+  double total_error = 0.0;
+  for (const auto &point : inlier_points) {
+    double y_estimated =
+        model.a * point[0] * point[0] + model.b * point[0] + model.c;
+    double error = point[1] - y_estimated;
+    total_error += error * error; // 平方误差
+  }
+  result->rmse = std::sqrt(total_error / inlier_points.size());
+}
+
+void Solution::SolveKalmanFilterProblem() {
+  LOG(INFO) << "[Solution] Solve Kalman Filter Problem." << std::endl;
+  const auto random_data = GenerateData(kRansacSamples, kRansacOutlierRatio);
+  std::vector<Point2d> inliers;
+  RansacModelParams base_best_model =
+      RansacFit(random_data, kRansacMaxIterations, &inliers);
+  FitResult ransac_fit_result;
+  EvaluateFitResult(base_best_model, random_data, inliers, &ransac_fit_result);
+  LOG(INFO) << "[Solution] base ransac fit inlier ratio: "
+            << ransac_fit_result.inlier_ratio
+            << " rmse: " << ransac_fit_result.rmse << std::endl;
+
+  Save2dPoints(
+      random_data,
+      "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/kalman_input.txt");
+
+  std::vector<Eigen::VectorXd> measurements;
+  for (const auto &point : random_data) {
+    Eigen::VectorXd measurement(2);
+    measurement << point[0], point[1];
+    measurements.push_back(measurement);
+  }
+  LOG(INFO) << "[Solution] total measurement size: " << measurements.size()
+            << std::endl;
+  kalman_filter_ =
+      std::make_unique<KalmanFilter>(measurements, base_best_model);
+  if (!kalman_filter_) {
+    LOG(INFO) << "[Solution] kalman_filter_ is nullptr !" << std::endl;
+    return;
+  }
+  LOG(INFO) << "[Solution] Kalman Filter initialized." << std::endl;
+  kalman_filter_->Process();
+  const auto output_data = kalman_filter_->GetResult();
+
+  std::vector<Point2d> output_points;
+  for (const Eigen::VectorXd &point : output_data) {
+    output_points.emplace_back(point[0], point[1]);
+  }
+  Save2dPoints(
+      output_points,
+      "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/kalman_data.txt");
+
+  RansacModelParams kf_best_model =
+      RansacFit(output_points, kRansacMaxIterations, &inliers);
+  FitResult kf_fit_result;
+  EvaluateFitResult(kf_best_model, random_data, inliers, &kf_fit_result);
+
+  LOG(INFO) << "[Solution] base ransac fit  " << ransac_fit_result.inlier_ratio
+            << " base rmse: " << ransac_fit_result.rmse
+            << " ,Kalman Filter fit inlier ratio: "
+            << kf_fit_result.inlier_ratio << " rmse: " << kf_fit_result.rmse;
+
+  return;
+}
 } // namespace Practice

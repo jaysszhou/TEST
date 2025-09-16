@@ -35,6 +35,7 @@ void Practice::run() {
   coc.Evaluate();
 
   solution.SolveRansacProblem();
+  solution.SolveKalmanFilterProblem();
 
   double number = 2;
   LOG(INFO) << std::setprecision(12)<< "[Solution] sqrt("<< number << ") = " << solution.SolveSqrt(number);
