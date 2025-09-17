@@ -4,6 +4,7 @@
 3. A* search 
 4. Dijkstra search
 5. RANSAC
+6. kalman-filter for smooth
  
 **2. build the project**
 ```bash
