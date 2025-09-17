@@ -67,10 +67,10 @@ double KalmanFilter::EstimateCurvature() {
   if (area < kEpsilon) {
     return 0.0;
   }
-  double a = (p2 - p1).norm();
-  double b = (p3 - p2).norm();
-  double c = (p1 - p3).norm();
-  double curvature = (4 * area) / (a * b * c + kEpsilon);
+  const double a = (p2 - p1).norm();
+  const double b = (p3 - p2).norm();
+  const double c = (p1 - p3).norm();
+  const double curvature = (4 * area) / (a * b * c + kEpsilon);
   return curvature;
 }
 
