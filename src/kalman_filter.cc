@@ -2,14 +2,14 @@
 
 namespace Practice {
 namespace {
-constexpr double kProcessNoise = 1e-2;     // 过程噪声
+constexpr double kProcessNoise = 1e1;     // 过程噪声
 constexpr double kMeasurementNoise = 1e-1; // 测量噪声
 constexpr double kEpsilon = 1e-6;          // 数值稳定性
 } // namespace
 
 void KalmanFilter::Init() {
   state_ = Eigen::Vector3d::Zero(); // [pos_x, pos_y, curvevature]
-  covariance_ = Eigen::Matrix3d::Identity() * 100;
+  covariance_ = Eigen::Matrix3d::Identity() * 1;
   process_noise_wk_ = Eigen::Matrix3d::Identity() * kProcessNoise;
   measurement_noise_vk_ = Eigen::Matrix2d::Identity() * kMeasurementNoise;
   observation_h_ = Eigen::Matrix<double, 2, 3>::Zero();
