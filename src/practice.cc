@@ -34,7 +34,7 @@ void Practice::run() {
   }
   coc.Evaluate();
 
-  solution.SolveRansacProblem();
+  // solution.SolveRansacProblem();
   solution.SolveKalmanFilterProblem();
 
   double number = 2;

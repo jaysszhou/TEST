@@ -797,7 +797,9 @@ void Solution::SolveKalmanFilterProblem() {
       RansacFit(random_data, kRansacMaxIterations, &inliers);
   FitResult ransac_fit_result;
   EvaluateFitResult(base_best_model, random_data, inliers, &ransac_fit_result);
-  LOG(INFO) << "[Solution] base ransac fit inlier ratio: "
+  LOG(INFO) << "[Solution] before KF model: " << base_best_model.a << "x^2 + "
+            << base_best_model.b << "x + " << base_best_model.c
+            << "RANSAC fit model inlier ratio: "
             << ransac_fit_result.inlier_ratio
             << " rmse: " << ransac_fit_result.rmse << std::endl;
 
@@ -805,16 +807,13 @@ void Solution::SolveKalmanFilterProblem() {
       random_data,
       "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/kalman_input.txt");
 
-  std::vector<Eigen::VectorXd> measurements;
-  for (const auto &point : random_data) {
-    Eigen::VectorXd measurement(2);
-    measurement << point[0], point[1];
-    measurements.push_back(measurement);
+  std::vector<Eigen::Vector2d> measurements;
+  for (const Eigen::Vector2d &point : random_data) {
+    measurements.emplace_back(point.head<2>());
   }
   LOG(INFO) << "[Solution] total measurement size: " << measurements.size()
             << std::endl;
-  kalman_filter_ =
-      std::make_unique<KalmanFilter>(measurements, base_best_model);
+  kalman_filter_ = std::make_unique<KalmanFilter>(measurements);
   if (!kalman_filter_) {
     LOG(INFO) << "[Solution] kalman_filter_ is nullptr !" << std::endl;
     return;
@@ -823,23 +822,19 @@ void Solution::SolveKalmanFilterProblem() {
   kalman_filter_->Process();
   const auto output_data = kalman_filter_->GetResult();
 
-  std::vector<Point2d> output_points;
-  for (const Eigen::VectorXd &point : output_data) {
-    output_points.emplace_back(point[0], point[1]);
-  }
   Save2dPoints(
-      output_points,
+      output_data,
       "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/kalman_data.txt");
 
   RansacModelParams kf_best_model =
-      RansacFit(output_points, kRansacMaxIterations, &inliers);
+      RansacFit(output_data, kRansacMaxIterations, &inliers);
   FitResult kf_fit_result;
   EvaluateFitResult(kf_best_model, random_data, inliers, &kf_fit_result);
 
-  LOG(INFO) << "[Solution] base ransac fit  " << ransac_fit_result.inlier_ratio
-            << " base rmse: " << ransac_fit_result.rmse
-            << " ,Kalman Filter fit inlier ratio: "
-            << kf_fit_result.inlier_ratio << " rmse: " << kf_fit_result.rmse;
+  LOG(INFO) << "[Solution] after KF model: " << kf_best_model.a << "x^2 + "
+            << kf_best_model.b << "x + " << kf_best_model.c
+            << "RANSAC fit model inlier ratio: " << kf_fit_result.inlier_ratio
+            << " rmse: " << kf_fit_result.rmse << std::endl;
 
   return;
 }

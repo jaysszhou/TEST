@@ -1,25 +1,26 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # 读取TXT文件
 def read_data(filename):
     x_data = []
     y_data = []
-    
+
     try:
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             for line in file:
                 # 跳过空行和注释行
-                if line.strip() == '' or line.startswith('#'):
+                if line.strip() == "" or line.startswith("#"):
                     continue
-                
+
                 # 尝试分割行数据（支持空格、逗号、制表符分隔）
                 parts = line.split()
                 if len(parts) < 2:
-                    parts = line.split(',')
+                    parts = line.split(",")
                 if len(parts) < 2:
-                    parts = line.split('\t')
-                
+                    parts = line.split("\t")
+
                 if len(parts) >= 2:
                     try:
                         x = float(parts[0])
@@ -32,47 +33,87 @@ def read_data(filename):
     except FileNotFoundError:
         print(f"错误: 文件 '{filename}' 未找到")
         return None, None
-    
+
     return np.array(x_data), np.array(y_data)
 
+
 # 拟合二次函数并绘制图像
-def plot_data_and_curve(x_data, y_data):
-    if x_data is None or len(x_data) == 0:
-        print("没有有效数据可绘制")
+def plot_data_and_curve(x_data1, y_data1, x_data2, y_data2):
+    if x_data1 is None or len(x_data1) == 0:
+        print("第一个数据集没有有效数据可绘制")
         return
     
-    # 使用numpy的polyfit进行二次拟合 (degree=2)
-    coefficients = np.polyfit(x_data, y_data, 2)
-    a, b, c = coefficients
+    if x_data2 is None or len(x_data2) == 0:
+        print("第二个数据集没有有效数据可绘制")
+        return
+
+    # 创建图形
+    plt.figure(figsize=(12, 8))
     
-    print(f"ransac result: y = {a:.4f}x² + {b:.4f}x + {c:.4f}")
+    # 绘制第一个数据集的散点图
+    plt.scatter(x_data1, y_data1, color="blue", label="Kalman Input Points", alpha=0.7, s=30)
+    
+    # 绘制第二个数据集的散点图
+    plt.scatter(x_data2, y_data2, color="red", label="Kalman Data Points", alpha=0.7, s=30)
+    
+    # 对第一个数据集进行二次拟合
+    coefficients1 = np.polyfit(x_data1, y_data1, 2)
+    a1, b1, c1 = coefficients1
+    print(f"Kalman Input 拟合结果: y = {a1:.4f}x² + {b1:.4f}x + {c1:.4f}")
+    
+    # 对第二个数据集进行二次拟合
+    coefficients2 = np.polyfit(x_data2, y_data2, 2)
+    a2, b2, c2 = coefficients2
+    print(f"Kalman Data 拟合结果: y = {a2:.4f}x² + {b2:.4f}x + {c2:.4f}")
     
     # 创建更密集的x值用于绘制平滑曲线
-    x_fit = np.linspace(min(x_data), max(x_data), 100)
-    y_fit = a * x_fit**2 + b * x_fit + c
+    x_min = min(min(x_data1), min(x_data2))
+    x_max = max(max(x_data1), max(x_data2))
+    x_fit = np.linspace(x_min, x_max, 100)
     
-    # 绘制图形
-    plt.figure(figsize=(10, 6))
-    plt.scatter(x_data, y_data, color='blue', label='points', alpha=0.7)
-    plt.plot(x_fit, y_fit, color='red', linewidth=2, label=f'y = {a:.4f}x² + {b:.4f}x + {c:.4f}')
+    # 计算拟合曲线
+    y_fit1 = a1 * x_fit**2 + b1 * x_fit + c1
+    y_fit2 = a2 * x_fit**2 + b2 * x_fit + c2
     
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.title('ransac fit result')
+    # 绘制拟合曲线
+    plt.plot(
+        x_fit,
+        y_fit1,
+        color="blue",
+        linewidth=2,
+        linestyle="--",
+        label=f"Kalman Input Fit: y = {a1:.4f}x² + {b1:.4f}x + {c1:.4f}",
+    )
+    
+    plt.plot(
+        x_fit,
+        y_fit2,
+        color="red",
+        linewidth=2,
+        linestyle="--",
+        label=f"Kalman Data Fit: y = {a2:.4f}x² + {b2:.4f}x + {c2:.4f}",
+    )
+
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Kalman Input and Data Points with Quadratic Fits")
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.show()
 
+
 # 主程序
 if __name__ == "__main__":
-    # filename = input("请输入TXT文件名(或直接按回车使用默认的'data.txt'): ").strip()
-    filename = "../out/ransac_data.txt"
-    if filename == "":
-        filename = "data.txt"
+    # 读取第一个文件
+    filename1 = "../out/kalman_input.txt"
+    x_data1, y_data1 = read_data(filename1)
     
-    x_data, y_data = read_data(filename)
+    # 读取第二个文件
+    filename2 = "../out/kalman_data.txt"
+    x_data2, y_data2 = read_data(filename2)
     
-    if x_data is not None and len(x_data) > 0:
-        plot_data_and_curve(x_data, y_data)
+    # 检查数据是否有效
+    if (x_data1 is not None and len(x_data1) > 0) and (x_data2 is not None and len(x_data2) > 0):
+        plot_data_and_curve(x_data1, y_data1, x_data2, y_data2)
     else:
         print("未能读取到有效数据")
