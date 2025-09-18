@@ -4,6 +4,7 @@
 
 #include "COC.h"
 #include "base_type.h"
+#include "extended_kalman_filter.h"
 #include "kalman_filter.h"
 
 #include <Eigen/Dense>
@@ -88,6 +89,7 @@ private:
 
 private:
   std::shared_ptr<KalmanFilter> kalman_filter_ = nullptr;
+  std::shared_ptr<ExtendedKalmanFilter> extended_kalman_filter_ = nullptr;
 };
 } // namespace Practice
 

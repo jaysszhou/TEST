@@ -833,8 +833,28 @@ void Solution::SolveKalmanFilterProblem() {
 
   LOG(INFO) << "[Solution] after KF model: " << kf_best_model.a << "x^2 + "
             << kf_best_model.b << "x + " << kf_best_model.c
-            << "RANSAC fit model inlier ratio: " << kf_fit_result.inlier_ratio
+            << " RANSAC fit model inlier ratio: " << kf_fit_result.inlier_ratio
             << " rmse: " << kf_fit_result.rmse << std::endl;
+
+  extended_kalman_filter_ =
+      std::make_unique<ExtendedKalmanFilter>(measurements);
+  if (!extended_kalman_filter_) {
+    LOG(INFO) << "[Solution] extended_kalman_filter_ is nullptr !" << std::endl;
+    return;
+  }
+  extended_kalman_filter_->Process();
+  const auto ekf_output_data = extended_kalman_filter_->GetResult();
+  Save2dPoints(
+      ekf_output_data,
+      "/home/jaysszhou/Documents/Algorithm/Github/TEST/out/ekf_data.txt");
+  RansacModelParams ekf_best_model =
+      RansacFit(ekf_output_data, kRansacMaxIterations, &inliers);
+  FitResult ekf_fit_result;
+  EvaluateFitResult(ekf_best_model, random_data, inliers, &ekf_fit_result);
+  LOG(INFO) << "[Solution] after EKF model: " << ekf_best_model.a << "x^2 + "
+            << ekf_best_model.b << "x + " << ekf_best_model.c
+            << " RANSAC fit model inlier ratio: " << ekf_fit_result.inlier_ratio
+            << " rmse: " << ekf_fit_result.rmse << std::endl;
 
   return;
 }

@@ -54,6 +54,7 @@ add_library(${PROJECT_NAME} SHARED
     src/map.cc
     src/COC.cc
     src/kalman_filter.cc
+    src/extended_kalman_filter.cc
 )
 
 # Link libraries to the shared library

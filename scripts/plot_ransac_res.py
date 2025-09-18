@@ -37,8 +37,8 @@ def read_data(filename):
     return np.array(x_data), np.array(y_data)
 
 
-# 拟合二次函数并绘制图像
-def plot_data_and_curve(x_data1, y_data1, x_data2, y_data2):
+# 拟合二次函数并绘制图像 - 修改为支持三个数据集
+def plot_data_and_curve(x_data1, y_data1, x_data2, y_data2, x_data3, y_data3):
     if x_data1 is None or len(x_data1) == 0:
         print("第一个数据集没有有效数据可绘制")
         return
@@ -46,15 +46,22 @@ def plot_data_and_curve(x_data1, y_data1, x_data2, y_data2):
     if x_data2 is None or len(x_data2) == 0:
         print("第二个数据集没有有效数据可绘制")
         return
+        
+    if x_data3 is None or len(x_data3) == 0:
+        print("第三个数据集没有有效数据可绘制")
+        return
 
     # 创建图形
     plt.figure(figsize=(12, 8))
     
     # 绘制第一个数据集的散点图
-    plt.scatter(x_data1, y_data1, color="blue", label="Kalman Input Points", alpha=0.7, s=30)
+    plt.scatter(x_data1, y_data1, color="blue", label="Input Points", alpha=0.7, s=30)
     
     # 绘制第二个数据集的散点图
-    plt.scatter(x_data2, y_data2, color="red", label="Kalman Data Points", alpha=0.7, s=30)
+    plt.scatter(x_data2, y_data2, color="red", label="KF Data Points", alpha=0.7, s=30)
+    
+    # 绘制第三个数据集的散点图
+    plt.scatter(x_data3, y_data3, color="green", label="EKF Data Points", alpha=0.7, s=30)
     
     # 对第一个数据集进行二次拟合
     coefficients1 = np.polyfit(x_data1, y_data1, 2)
@@ -66,14 +73,20 @@ def plot_data_and_curve(x_data1, y_data1, x_data2, y_data2):
     a2, b2, c2 = coefficients2
     print(f"Kalman Data 拟合结果: y = {a2:.4f}x² + {b2:.4f}x + {c2:.4f}")
     
+    # 对第三个数据集进行二次拟合
+    coefficients3 = np.polyfit(x_data3, y_data3, 2)
+    a3, b3, c3 = coefficients3
+    print(f"EKF Data 拟合结果: y = {a3:.4f}x² + {b3:.4f}x + {c3:.4f}")
+    
     # 创建更密集的x值用于绘制平滑曲线
-    x_min = min(min(x_data1), min(x_data2))
-    x_max = max(max(x_data1), max(x_data2))
+    x_min = min(min(x_data1), min(x_data2), min(x_data3))
+    x_max = max(max(x_data1), max(x_data2), max(x_data3))
     x_fit = np.linspace(x_min, x_max, 100)
     
     # 计算拟合曲线
     y_fit1 = a1 * x_fit**2 + b1 * x_fit + c1
     y_fit2 = a2 * x_fit**2 + b2 * x_fit + c2
+    y_fit3 = a3 * x_fit**2 + b3 * x_fit + c3
     
     # 绘制拟合曲线
     plt.plot(
@@ -93,10 +106,19 @@ def plot_data_and_curve(x_data1, y_data1, x_data2, y_data2):
         linestyle="--",
         label=f"Kalman Data Fit: y = {a2:.4f}x² + {b2:.4f}x + {c2:.4f}",
     )
+    
+    plt.plot(
+        x_fit,
+        y_fit3,
+        color="green",
+        linewidth=2,
+        linestyle="--",
+        label=f"EKF Data Fit: y = {a3:.4f}x² + {b3:.4f}x + {c3:.4f}",
+    )
 
     plt.xlabel("X")
     plt.ylabel("Y")
-    plt.title("Kalman Input and Data Points with Quadratic Fits")
+    plt.title("Kalman Input, Kalman Data and EKF Data Points with Quadratic Fits")
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.show()
@@ -112,8 +134,14 @@ if __name__ == "__main__":
     filename2 = "../out/kalman_data.txt"
     x_data2, y_data2 = read_data(filename2)
     
+    # 读取第三个文件
+    filename3 = "../out/ekf_data.txt"
+    x_data3, y_data3 = read_data(filename3)
+    
     # 检查数据是否有效
-    if (x_data1 is not None and len(x_data1) > 0) and (x_data2 is not None and len(x_data2) > 0):
-        plot_data_and_curve(x_data1, y_data1, x_data2, y_data2)
+    if (x_data1 is not None and len(x_data1) > 0) and \
+       (x_data2 is not None and len(x_data2) > 0) and \
+       (x_data3 is not None and len(x_data3) > 0):
+        plot_data_and_curve(x_data1, y_data1, x_data2, y_data2, x_data3, y_data3)
     else:
         print("未能读取到有效数据")
